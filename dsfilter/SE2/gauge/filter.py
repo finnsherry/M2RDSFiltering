@@ -171,7 +171,7 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, gauge_frame_static, T, G_D_
         PSNR.append(compute_PSNR(u_projected, ground_truth, max_val))
         L2.append(compute_L2(u_projected, ground_truth))
         L1.append(compute_L1(u_projected, ground_truth))
-    return u.to_numpy(), np.array(PSNR), np.array(L2), np.array(L1), switch_DS.to_numpy(), switch_morph.to_numpy()
+    return u.to_numpy(), np.array(PSNR), np.array(L2), np.array(L1)
 
 @ti.kernel
 def step_DS(
@@ -293,7 +293,7 @@ def compute_timestep_shock(dxy, dθ, G_S_inv, ξ):
 
 def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, ξ, dxy, dθ, gauge_frame_static, σ_s, σ_o, T, dt=None, λ=1.):
     """
-    Perform Total Variation (TV) Flow inpainting in SE(2).
+    Perform Total Roto-Translation Variation (TR-TV) Flow inpainting in SE(2).
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
