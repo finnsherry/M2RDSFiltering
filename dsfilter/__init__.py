@@ -38,7 +38,6 @@ from dsfilter.R3.filter import DS_filter as DS_filter_R3
 ## SE(2)
 ### Left invariant
 from dsfilter.SE2.LI.filter import DS_inpainting as DS_inpainting_LI
-from dsfilter.SE2.LI.filter import DS_inpainting_spatial as DS_inpainting_spatial
 from dsfilter.SE2.LI.filter import DS_enhancing as DS_enhancing_LI
 from dsfilter.SE2.LI.filter import TV_enhancing as TV_enhancing_LI
 ### Gauge
