@@ -188,7 +188,6 @@ def convolve_with_kernel_θ_dir(
         u_convolved[x, y, θ] = s
 
 
-
 # Helper Functions
 
 @ti.func
