@@ -27,17 +27,17 @@
 import taichi as ti
 import numpy as np
 from tqdm import tqdm
-from dsfilter.SE2.gauge.switches import (
+from dsfilter.M2.gauge.switches import (
     DS_switch,
     morphological_switch,
 )
-from dsfilter.SE2.gauge.derivatives import (
+from dsfilter.M2.gauge.derivatives import (
     laplacian,
     morphological,
     TV
 )
-from dsfilter.SE2.regularisers import gaussian_kernel
-from dsfilter.SE2.utils import project_down
+from dsfilter.M2.regularisers import gaussian_kernel
+from dsfilter.M2.utils import project_down
 from dsfilter.utils import (
     compute_PSNR,
     compute_L2,

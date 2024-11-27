@@ -23,12 +23,12 @@
 """
 
 import taichi as ti
-from dsfilter.SE2.regularisers import (
+from dsfilter.M2.regularisers import (
     convolve_with_kernel_x_dir,
     convolve_with_kernel_y_dir,
     convolve_with_kernel_θ_dir
 )
-from dsfilter.SE2.LI.derivatives import (
+from dsfilter.M2.LI.derivatives import (
     laplace_perp,
     gradient
 )

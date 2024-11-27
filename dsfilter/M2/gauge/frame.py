@@ -2,7 +2,7 @@
     frame
     =====
 
-    Compute the gauge frames fitted to data on SE(2), using:
+    Compute the gauge frames fitted to data on M_2, using:
       1. `compute_gauge_frame_and_orientation_confidence`: fit the gauge frame
       and compute the orientation confidence, see [2].
       2. `compute_deviation_from_horizontality`: compute the deviation from
@@ -25,18 +25,6 @@
 
 import numpy as np
 import scipy as sp
-
-# Maybe do a TaiChi implementation eventually.
-# import taichi as ti
-# from dsfilter.SE2.utils import scalar_trilinear_interpolate
-# from dsfilter.SE2.regularisers import (
-#     convolve_with_kernel_x_dir,
-#     convolve_with_kernel_y_dir,
-#     convolve_with_kernel_θ_dir,
-#     convolve_matrix_3_by_3_with_kernel_x_dir,
-#     convolve_matrix_3_by_3_with_kernel_y_dir,
-#     convolve_matrix_3_by_3_with_kernel_θ_dir
-# )
 
 # NumPy implementation
 

@@ -8,8 +8,8 @@
 """
 
 import taichi as ti
-from dsfilter.SE2.utils import scalar_trilinear_interpolate
-from dsfilter.SE2.regularisers import (
+from dsfilter.M2.utils import scalar_trilinear_interpolate
+from dsfilter.M2.regularisers import (
     convolve_with_kernel_x_dir,
     convolve_with_kernel_y_dir,
     convolve_with_kernel_θ_dir

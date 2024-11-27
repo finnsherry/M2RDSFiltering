@@ -1,12 +1,12 @@
 """
-    SE2
-    ===
+    M2
+    ==
 
-    Apply Diffusion-Shock filtering on SE(2).
+    Apply Diffusion-Shock filtering on M_2.
 
     Provides the following "top level" submodule:
-      1. LI: perform DS filtering on SE(2) using left invariant vector fields.
-      2. TODO: gauge: perform DS filtering on SE(2) using gauge frames.
+      1. LI: perform DS filtering on M_2 using left invariant vector fields.
+      2. gauge: perform DS filtering on M_2 using gauge frames.
 
     Additionally, we have the following "internal" submodules
       1. regularisers: 
@@ -14,7 +14,7 @@
 """
 
 # Access entire backend
-import dsfilter.SE2.regularisers
-import dsfilter.SE2.utils
-import dsfilter.SE2.LI
-import dsfilter.SE2.gauge
+import dsfilter.M2.regularisers
+import dsfilter.M2.utils
+import dsfilter.M2.LI
+import dsfilter.M2.gauge

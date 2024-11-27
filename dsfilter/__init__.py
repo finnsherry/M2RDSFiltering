@@ -3,12 +3,12 @@
     ======
 
     The Python package *dsfilter* contains methods to apply Diffusion-Shock
-    filtering, as described in Schaefer and Weickert,[1][2] on R^2 and SE(2).
+    filtering, as described in Schaefer and Weickert,[1][2] on R^2 and M_2.
 
     One application ...
 
     Summary: enhance images by applying Diffusion-Shock filtering in R^2 and
-    SE(2).
+    M_2.
     
     References:
       [1]: K. Schaefer and J. Weickert.
@@ -27,7 +27,7 @@ import dsfilter.visualisations
 import dsfilter.orientationscore
 import dsfilter.R2
 import dsfilter.R3
-import dsfilter.SE2
+import dsfilter.M2
 
 # Most important functions are available at top level
 ## R2
@@ -37,9 +37,9 @@ from dsfilter.R2.filter import DS_enhancing as DS_enhancing_R2
 from dsfilter.R3.filter import DS_filter as DS_filter_R3
 ## SE(2)
 ### Left invariant
-from dsfilter.SE2.LI.filter import DS_inpainting as DS_inpainting_LI
-from dsfilter.SE2.LI.filter import DS_enhancing as DS_enhancing_LI
-from dsfilter.SE2.LI.filter import TV_enhancing as TV_enhancing_LI
+from dsfilter.M2.LI.filter import DS_inpainting as DS_inpainting_LI
+from dsfilter.M2.LI.filter import DS_enhancing as DS_enhancing_LI
+from dsfilter.M2.LI.filter import TV_enhancing as TV_enhancing_LI
 ### Gauge
-from dsfilter.SE2.gauge.filter import DS_enhancing as DS_enhancing_gauge
-from dsfilter.SE2.gauge.filter import TV_enhancing as TV_enhancing_gauge
+from dsfilter.M2.gauge.filter import DS_enhancing as DS_enhancing_gauge
+from dsfilter.M2.gauge.filter import TV_enhancing as TV_enhancing_gauge
