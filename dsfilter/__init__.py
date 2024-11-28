@@ -26,16 +26,13 @@ import dsfilter.utils
 import dsfilter.visualisations
 import dsfilter.orientationscore
 import dsfilter.R2
-import dsfilter.R3
 import dsfilter.M2
 
 # Most important functions are available at top level
 ## R2
 from dsfilter.R2.filter import DS_inpainting as DS_inpainting_R2
 from dsfilter.R2.filter import DS_enhancing as DS_enhancing_R2
-## R3
-from dsfilter.R3.filter import DS_filter as DS_filter_R3
-## SE(2)
+## M2
 ### Left invariant
 from dsfilter.M2.LI.filter import DS_inpainting as DS_inpainting_LI
 from dsfilter.M2.LI.filter import DS_enhancing as DS_enhancing_LI
