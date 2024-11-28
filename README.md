@@ -18,8 +18,9 @@ To reproduce the experiments, one additionally needs:
 
 Alternatively, one can create the required conda environment from `min_env.yml`:
 ```
-conda env create -f min_env.yml
+conda env create -f dsfilter.yml
 ```
+This creates a conda environment called `dsfilter`.
 
 Subsequently, one must install the code of this project as a package, by running:
 ```
