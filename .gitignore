@@ -3,6 +3,7 @@ test*
 old*
 
 output
+*.egg*
 
 *.jpg
 *.png

@@ -1,5 +1,7 @@
 # M2RDSFiltering
-This repository contains code to perform Regularised Diffusion-Shock (RDS) Filtering on $\mathbb{R}^2$ and $\mathbb{M}_2$, as described in [[1]](#1). The results of [[1]](#1) can be reproduced with the notebooks in the `experiments` directory.
+This repository contains code to perform Regularised Diffusion-Shock (RDS) Filtering on two dimensional Euclidean space, $\mathbb{R}^2$, and the corresponding space of positions and orientations, $\mathbb{M}_2 \coloneqq \mathbb{R}^2 \times S^1$, as described in [[1]](#1). The results of [[1]](#1) can be reproduced with the notebooks in the `experiments` directory.
+
+This work extends $\mathbb{R}^2$ RDS by Schaefer & Weickert [[2]](#2).
 
 ## Installation
 The core functionality of this repository requires:
@@ -41,7 +43,7 @@ The main functionality is exposed as top level functions:
 ## Cite
 If you use this code in your own work, please cite our paper:
 
-<a id="1">[1]</a> Sherry, F.M., Schaefer, K., Duits, R. Diffusion-Shock Filtering on the Space of Positions and Orientations. 10th International Conference on Scale Space and Variational Methods in Computer Vision (SSVM), (2025).
+<a id="1">[1]</a> Sherry, F.M., Schaefer, K., Duits, R. "Diffusion-Shock Filtering on the Space of Positions and Orientations." 10th International Conference on Scale Space and Variational Methods in Computer Vision (SSVM) (2025).
 
 ```
 @inproceedings{Sherry2025DSM2,
@@ -54,5 +56,20 @@ If you use this code in your own work, please cite our paper:
   pages =        {},
   doi =          {},
   editor =       {}
+}
+```
+
+<a id="2">[2]</a> Schaefer, K., Weickert, J. "Regularised Diffusion-Shock Inpainting." Journal of Mathematical Imaging and Vision (2024). https://doi.org/10.1007/s10851-024-01175-0
+
+```
+@article{Schaefer2024RDS,
+  author =       {Schaefer, Kristina and Weickert, Joachim},
+  title =        {{Regularised Diffusion-Shock Inpainting}},
+  journal =      {Journal of Mathematical Imaging and Vision},
+  publisher =    {Springer},
+  year =         {2024},
+  volume =       {66},
+  pages =        {447--463},
+  doi =          {10.1007/s10851-024-01175-0}
 }
 ```
