@@ -1,6 +1,6 @@
 """
     DSFilter
-    ======
+    ========
 
     The Python package *dsfilter* contains methods to apply Diffusion-Shock
     filtering, as described in Schaefer and Weickert,[1][2] on R^2 and M_2. The

@@ -3,8 +3,10 @@
     ======
 
     Provides methods to apply R^2 Diffusion-Shock inpainting, as described by
-    K. Schaefer and J. Weickert.[1][2] The primary method is:
-      1. `DS_filter`: apply R^2 Diffusion-Shock inpainting to an array
+    K. Schaefer and J. Weickert.[1][2] The primary methods are:
+      1. `DS_enhancing`: apply R^2 Diffusion-Shock filtering for denoising to an
+      array describing an image, given various PDE parameters.
+      2. `DS_inpainting`: apply R^2 Diffusion-Shock inpainting an array
       describing an image, given an inpainting mask and various PDE parameters.
 
     References:
@@ -36,15 +38,14 @@ from dsfilter.utils import (
     compute_L1
 )
 
-def DS_enhancing(u0_np, ground_truth_np, T, σ, ρ, ν, λ, ε=0., dxy=1.):
+def DS_enhancing(u0_np, ground_truth_np, T, σ, ρ, ν, λ, ε=0., dxy=1., max_val=255.):
     """
-    Perform Diffusion-Shock inpainting in R^2, according to Schaefer and
-    Weickert.[1][2]
+    Perform Diffusion-Shock filtering in R^2 for denoising, according to
+    Schaefer and Weickert.[1][2]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny].
-        `mask_np`: np.ndarray inpainting mask, with shape [Nx, Ny], taking
-          values 0 and 1. Wherever the value is 1, no inpainting happens.
+        `ground_truth_np`: np.ndarray ground truth, with shape [Nx, Ny].
         `T`: time that image is evolved under the DS PDE.
         `σ`: standard deviation of the internal regularisation of the structure
           tensor, used for determining whether to perform dilation or erosion.
@@ -59,12 +60,12 @@ def DS_enhancing(u0_np, ground_truth_np, T, σ, ρ, ν, λ, ε=0., dxy=1.):
         `ε`: regularisation parameter for the signum function used to switch
           between dilation and erosion.
         `dxy`: size of pixels in the x- and y-directions. Defaults to 1.
+        `max_val`: maximum value that image can achieve. We assume the image
+          takes values in [0, `max_val`]. Defaults to 255.
 
     Returns:
         np.ndarray solution to the DS PDE with initial condition `u0_np` at
         time `T`.
-        TEMP: np.ndarray switch between diffusion and shock, and np.ndarray
-        switch between dilation and erosion.
 
     References:
         [1]: K. Schaefer and J. Weickert.
@@ -121,7 +122,6 @@ def DS_enhancing(u0_np, ground_truth_np, T, σ, ρ, ν, λ, ε=0., dxy=1.):
     switch_morph = ti.field(dtype=ti.f32, shape=shape)
 
     ## Image Quality Measures
-    max_val = 255. # Images are assumed to take gray values in [0, 255].
     ground_truth = ti.field(dtype=ti.f32, shape=shape)
     ground_truth.from_numpy(ground_truth_np)
     PSNR = [compute_PSNR(u, ground_truth, max_val)]
@@ -174,8 +174,6 @@ def DS_inpainting(u0_np, mask_np, T, σ, ρ, ν, λ, ε=0., dxy=1.):
     Returns:
         np.ndarray solution to the DS PDE with initial condition `u0_np` at
         time `T`.
-        TEMP: np.ndarray switch between diffusion and shock, and np.ndarray
-        switch between dilation and erosion.
 
     References:
         [1]: K. Schaefer and J. Weickert.
@@ -279,8 +277,8 @@ def compute_timestep(dxy, δ=np.sqrt(2)-1):
 
 def compute_timestep_diffusion(dxy, δ=np.sqrt(2)-1):
     """
-    Compute timestep to solve Diffusion-Shock PDE,[1][2] such that the scheme
-    retains the maximum-minimum principle of the continuous PDE.
+    Compute timestep to solve Diffusion PDE,[1][2] such that the scheme retains
+    the maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -308,8 +306,8 @@ def compute_timestep_diffusion(dxy, δ=np.sqrt(2)-1):
 
 def compute_timestep_shock(dxy, δ=np.sqrt(2)-1):
     """
-    Compute timestep to solve Diffusion-Shock PDE,[1][2] such that the scheme
-    retains the maximum-minimum principle of the continuous PDE.
+    Compute timestep to solve (Coherence-Enhancing) Shock PDE,[1][2] such that
+    the scheme retains the maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -351,7 +349,7 @@ def step_DS(
     """
     @taichi.kernel
 
-    Perform a single timestep Diffusion-Shock inpainting according to Eq. (12)
+    Perform a single timestep Diffusion-Shock filtering according to Eq. (12)
     in [1] by K. Schaefer and J. Weickert.
 
     Args:
@@ -421,60 +419,3 @@ def fill_u_switch(
     """
     for I in ti.grouped(u_switch):
         u_switch[I] = u[I]
-
-
-# Alternative inpainting algorithms
-## Diffusion Inpainting
-        
-def diffusion_inpainting(u0_np, mask_np, dxy, T):
-    """
-    Perform Diffusion inpainting in R^2.
-
-    Args:
-        `u0_np`: np.ndarray initial condition, with shape [Nx, Ny].
-        `mask_np`: np.ndarray inpainting mask, with shape [Nx, Ny], taking
-          values 0 and 1. Wherever the value is 1, no inpainting happens.
-        `dxy`: size of pixels in the x- and y-directions.
-        `T`: time that image is evolved under the diffusion PDE.
-
-    Returns:
-        np.ndarray solution to the diffusion PDE with initial condition `u0_np`
-        at time `T`.
-    """
-    dt = compute_timestep_diffusion(dxy)
-    n = int(T / dt)
-    shape = u0_np.shape
-    u = ti.field(dtype=ti.f32, shape=shape)
-    u.from_numpy(u0_np)
-    mask =ti.field(dtype=ti.f32, shape=shape)
-    mask.from_numpy(mask_np)
-    laplacian_u = ti.field(dtype=ti.f32, shape=shape)
-    for _ in tqdm(range(n)):
-        laplacian(u, dxy, laplacian_u)
-        step_diffusion_inpainting(u, mask, dt, laplacian_u)
-    return u.to_numpy()
-    
-@ti.kernel
-def step_diffusion_inpainting(
-    u: ti.template(),
-    mask: ti.template(),
-    dt: ti.f32,
-    laplacian_u: ti.template()
-):
-    """
-    @taichi.kernel
-
-    Perform a single timestep of diffusion inpainting.
-
-    Args:
-      Static:
-        `mask`: ti.field(dtype=[float], shape=[Nx, Ny]) inpainting mask.
-        `dt`: step size, taking values greater than 0.
-        `laplacian_u`: ti.field(dtype=[float], shape=[Nx, Ny]) of laplacian of
-          `u`, which is updated in place.
-      Mutated:
-        `u`: ti.field(dtype=[float], shape=[Nx, Ny]) which we want to evolve
-          with the diffusion PDE.
-    """
-    for I in ti.grouped(laplacian_u):
-        u[I] += dt * laplacian_u[I] * (1 - mask[I])

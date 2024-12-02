@@ -11,8 +11,8 @@
       1. derivatives: compute various derivatives of functions on R^2.
       2. switches: compute the quantities that switch between diffusion and
       shock and between erosion and dilation.
-      3. regularisers:
-      4. utils:
+      3. regularisers: regularise functions on R^2 with Gaussian filters.
+      4. utils: miscellaneous utilities.
 """
 
 # Access entire backend
