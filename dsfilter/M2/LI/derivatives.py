@@ -70,6 +70,48 @@ def laplacian(
         laplacian_u[I] = G_inv[0] * A11 + G_inv[1] * A22 + G_inv[2] * A33
 
 @ti.kernel
+def laplacian_s(
+    u: ti.template(),
+    G_inv: ti.types.vector(2, ti.f32),
+    dxy: ti.f32,
+    θs: ti.template(),
+    laplacian_u: ti.template()
+):
+    """
+    @taichi.kernel
+
+    Compute an approximation of the spatial Laplace-Beltrami operator applied to
+    `u` using central differences.
+
+    Args:
+      Static:
+        `u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) which we want to
+          differentiate.
+        `G_inv`: ti.types.vector(n=2, dtype=[float]) spatial constants of the
+          inverse of the diagonal metric tensor with respect to left invariant basis.
+        `dxy`: step size in x and y direction, taking values greater than 0.
+        `θs`: angle coordinate at each grid point.
+      Mutated:
+        `laplacian_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) spatial
+          laplacian of u, which is updated in place.
+    """
+    for I in ti.grouped(laplacian_u):
+        θ = θs[I]
+        cos = ti.math.cos(θ)
+        sin = ti.math.sin(θ)
+        I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32)
+        I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
+
+        A11 = (scalar_trilinear_interpolate(u, I + I_A1) -
+               2 * u[I] +
+               scalar_trilinear_interpolate(u, I - I_A1)) / dxy**2
+        A22 = (scalar_trilinear_interpolate(u, I + I_A2) -
+               2 * u[I] +
+               scalar_trilinear_interpolate(u, I - I_A2)) / dxy**2
+        # Δu = div(grad(u)) = sqrt(det(g)) A_i (sqrt(det(g)) g^ij A_j u) = g^ij A_i A_j u = g^ii A_i A_i u
+        laplacian_u[I] = G_inv[0] * A11 + G_inv[1] * A22
+
+@ti.kernel
 def morphological(
     u: ti.template(),
     G_inv: ti.types.vector(3, ti.f32),
@@ -130,6 +172,60 @@ def morphological(
             G_inv[2] * select_upwind_derivative_erosion(A3_forward, A3_backward)**2
         )
 
+@ti.kernel
+def morphological_s(
+    u: ti.template(),
+    G_inv: ti.types.vector(2, ti.f32),
+    dxy: ti.f32,
+    θs: ti.template(),
+    dilation_u: ti.template(),
+    erosion_u: ti.template()
+):
+    """
+    @taichi.kernel
+
+    Compute upwind approximations of the spatial morphological derivatives
+    +/- ||grad `u`||.
+
+    Args:
+      Static:
+        `u`: ti.field(dtype=[float], shape=[Nx+2, Ny+2, Nθ]) which we want to 
+          differentiate.
+        `G_inv`: ti.types.vector(n=2, dtype=[float]) spatial constants of the
+          inverse of the diagonal metric tensor with respect to left invariant
+          basis.
+        `θs`: angle coordinate at each grid point.
+        `dxy`: step size in x and y direction, taking values greater than 0.
+      Mutated:
+        `dilation_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) ||grad `u`||,
+          which is updated in place.
+        `erosion_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) -||grad `u`||,
+          which is updated in place.
+    """
+    for I in ti.grouped(dilation_u):
+        θ = θs[I]
+        cos = ti.math.cos(θ)
+        sin = ti.math.sin(θ)
+        I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32)
+        I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
+
+        A1_forward = (scalar_trilinear_interpolate(u, I + I_A1) - u[I]) / dxy
+        A2_forward = (scalar_trilinear_interpolate(u, I + I_A2) - u[I]) / dxy
+        A1_backward = (u[I] - scalar_trilinear_interpolate(u, I - I_A1)) / dxy
+        A2_backward = (u[I] - scalar_trilinear_interpolate(u, I - I_A2)) / dxy
+
+        # ||grad u|| = sqrt(G(grad u, grad u)) = sqrt(g^ij A_i u A_j u) = sqrt(g^ii (A_i u)^2)
+        # Dilation
+        dilation_u[I] = ti.math.sqrt(
+            G_inv[0] * select_upwind_derivative_dilation(A1_forward, A1_backward)**2 +
+            G_inv[1] * select_upwind_derivative_dilation(A2_forward, A2_backward)**2
+        )
+        # Erosion
+        erosion_u[I] = -ti.math.sqrt(
+            G_inv[0] * select_upwind_derivative_erosion(A1_forward, A1_backward)**2 +
+            G_inv[1] * select_upwind_derivative_erosion(A2_forward, A2_backward)**2
+        )
+
 @ti.func
 def gradient(
     u: ti.template(),
@@ -177,6 +273,43 @@ def gradient(
         )
 
 @ti.func
+def gradient_s(
+    u: ti.template(),
+    dxy: ti.f32,
+    θs: ti.template(),
+    gradient_u: ti.template()
+):
+    """
+    @taichi.func
+
+    Compute an approximation of the spatial gradient of `u` using
+    central differences.
+
+    Args:
+      Static:
+        `u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) which we want to
+          differentiate.
+        `dxy`: step size in x and y direction, taking values greater than 0.
+        `θs`: angle coordinate at each grid point.
+      Mutated:
+        `gradient_perp_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) spatial
+          gradient of u, which is updated in place.
+    """
+    for I in ti.grouped(gradient_u):
+        θ = θs[I]
+        cos = ti.math.cos(θ)
+        sin = ti.math.sin(θ)
+        I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32) / 2
+        I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32) / 2
+        # ||grad u|| = sqrt(G(grad u, grad u)) = sqrt(g^ij A_i u A_j u) = sqrt(g^11 (A_1 u)^2 + g^22 (A_2 u)^2)
+        gradient_u[I] = ti.math.sqrt(((
+                scalar_trilinear_interpolate(u, I + I_A1) - scalar_trilinear_interpolate(u, I - I_A1)
+            ) / dxy)**2 + ((
+                scalar_trilinear_interpolate(u, I + I_A2) - scalar_trilinear_interpolate(u, I - I_A2)
+            ) / dxy)**2
+        )
+
+@ti.func
 def laplace_perp(
     u: ti.template(),
     dxy: ti.f32,
@@ -218,6 +351,40 @@ def laplace_perp(
             ) / (ξ * dxy)**2 + (
                 scalar_trilinear_interpolate(u, I + I_A3) - 2 * u[I] + scalar_trilinear_interpolate(u, I - I_A3)
             ) / dθ**2
+        )
+
+@ti.func
+def laplace_perp_s(
+    u: ti.template(),
+    dxy: ti.f32,
+    θs: ti.template(),
+    laplace_perp_u: ti.template()
+):
+    """
+    @taichi.func
+
+    Compute an approximation of the spatial perpendicular laplacian of `u` using
+    central differences.
+
+    Args:
+      Static:
+        `u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) which we want to
+          differentiate.
+        `dxy`: step size in x and y direction, taking values greater than 0.
+        `θs`: angle coordinate at each grid point.
+      Mutated:
+        `laplace_perp_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ])
+          perpendicular laplacian of u, which is updated in place.
+    """
+    for I in ti.grouped(laplace_perp_u):
+        θ = θs[I]
+        cos = ti.math.cos(θ)
+        sin = ti.math.sin(θ)
+        I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
+        # Δ_perp u = div_perp(grad_perp(u)) = sqrt(det(g)) A_i (sqrt(det(g)) g^ij A_j u) = g^ij A_i A_j u = A_2 A_2 u
+        laplace_perp_u[I] = ((
+                scalar_trilinear_interpolate(u, I + I_A2) - 2 * u[I] + scalar_trilinear_interpolate(u, I - I_A2)
+            ) / dxy**2
         )
 
 @ti.kernel
