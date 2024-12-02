@@ -3,8 +3,10 @@
     ===========
 
     Provides a variety of derivative operators on M_2, namely:
-      1. `laplacian`: 
-      2. `morphological`: 
+      1. `laplacian`: computes an approximation of the data-driven 0 Lie-Cartan
+      Laplacian given some metric tensor field, see Eq. (9) in [1].
+      2. `morphological`: computes approximations of the dilation and erosion
+      operators +/- ||grad u||, see Eq. (10) in [1].
 """
 
 import taichi as ti
@@ -302,8 +304,8 @@ def TV(
     """
     @taichi.kernel
 
-    Compute an approximation of the Total Variation (TV) operator applied to `u`
-    using central differences.
+    Compute an approximation of the Total Roto-Translational Variation (TR-TV)
+    operator applied to `u` using central differences.[1]
 
     Args:
       Static:
@@ -318,6 +320,13 @@ def TV(
       Mutated:
         `TV_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) laplacian of
           u, which is updated in place.
+
+    References:
+        [1]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+          "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+          Positions and Orientations." In: Journal of Mathematical Imaging and
+          Vision (2021), pp. 237-262.
+          DOI:10.1007/s10851-020-00991-4.
     """
     h = ξ * dxy
     for I in ti.grouped(B1_u):

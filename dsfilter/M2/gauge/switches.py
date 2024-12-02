@@ -3,7 +3,7 @@
     ========
 
     Provides the operators to switch between diffusion and shock, and between
-    dilation and erosion, as described by K. Schaefer and J. Weickert.[1][2]
+    dilation and erosion, as described in [1].
     The primary methods are:
       1. `DS_switch`: switches between diffusion and shock. If there is locally
       a clear orientation, more shock is applied, see Eq. (7) in [1].
@@ -12,14 +12,10 @@
       concave, dilation is applied, see Eq. (4) in [1].
 
     References:
-      [1]: K. Schaefer and J. Weickert.
-      "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
-      Computer Vision 14009 (2023), pp. 588--600.
-      DOI:10.1137/15M1018460.
-      [2]: K. Schaefer and J. Weickert.
-      "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
-      Imaging and Vision (2024).
-      DOI:10.1007/s10851-024-01175-0.
+      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
+      DOI:.
 """
 
 import taichi as ti
@@ -62,7 +58,7 @@ def DS_switch(
     @taichi.kernel
 
     Determine to what degree we should perform diffusion or shock, as described
-    by K. Schaefer and J. Weickert.[1][2]
+    in Eq. (11) in [1].
 
     Args:
       Static:
@@ -93,14 +89,11 @@ def DS_switch(
           intermediate results when performing convolutions.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     # First regularise internally with Gaussian convolution.
     convolve_with_kernel_x_dir(u, k_s, radius_s, switch)
@@ -135,10 +128,10 @@ def morphological_switch(
     storage: ti.template()
 ):
     """
-    @taichi.func
-    
-    Determine whether to perform dilation or erosion, as described by
-    K. Schaefer and J. Weickert.[1][2]
+    @taichi.kernel
+
+    Determine to what degree we should spatially perform diffusion or shock, as
+    described in Eq. (11) in [1].
 
     Args:
       Static:
@@ -178,14 +171,11 @@ def morphological_switch(
           intermediate results when performing convolutions.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     # First regularise internally with Gaussian convolution.
     convolve_with_kernel_x_dir(u, k_int_s, radius_int_s, switch)

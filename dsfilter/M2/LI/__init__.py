@@ -1,5 +1,5 @@
 """
-    M2
+    LI
     ==
 
     Apply left-invariant Diffusion-Shock filtering on M_2.

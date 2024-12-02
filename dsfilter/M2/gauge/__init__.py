@@ -1,11 +1,11 @@
 """
-    M2
-    ==
+    gauge
+    =====
 
-    Apply Diffusion-Shock filtering on M_2 using gauge frames.
+    Apply gauge frame Diffusion-Shock filtering on M_2.
 
     Provides the following "top level" submodule:
-      1. filter: apply the Diffusion-Shock filter to an image on M_2.
+      1. filter: apply the gauge frame RDS filtering on M_2.
 
     Additionally, we have the following "internal" submodules
       1. derivatives: compute various derivatives of functions on M_2.

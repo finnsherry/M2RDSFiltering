@@ -2,8 +2,9 @@
     filter
     ======
 
-    Provides methods to apply M_2 Diffusion-Shock filtering,[1] inspired by the
-    Diffusion-Shock filtering on R^2 by K. Schaefer and J. Weickert.[2][3]
+    Provides methods to apply left-invariant M_2 Diffusion-Shock filtering,[1]
+    inspired by the Diffusion-Shock filtering on R^2 by K. Schaefer and
+    J. Weickert.[2][3]
     The primary methods are:
       1. `DS_enhancing_LI`: perform left-invariant RDS filtering on M_2 for
       denoising.
@@ -415,7 +416,8 @@ def compute_timestep_shock(dxy, dθ, G_S_inv):
 
 def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, dxy, dθ, θs_np, σ_s, σ_o, T, dt=None, λ=1.):
     """
-    Perform Total Roto-Translational Variation (TR-TV) Flow in M_2.[1][2]
+    Perform left-invariant Total Roto-Translational Variation (TR-TV) Flow in
+    M_2.[1][2]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].

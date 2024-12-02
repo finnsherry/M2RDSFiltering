@@ -6,22 +6,33 @@
     frames, inspired by the Diffusion-Shock inpainting on R^2 by K. Schaefer and
     J. Weickert.[1][2]
     The primary methods are:
-      1. `DS_filter_lines`: apply M_2 Diffusion-Shock inpainting to an array
-      describing an image consisting of lines, given an inpainting mask and
-      various PDE parameters.
-      1. `DS_filter_planes`: apply M_2 Diffusion-Shock inpainting to an array
-      describing an image consisting of lines and flat areas, given an
-      inpainting mask and various PDE parameters.
+      1. `DS_enhancing_gauge`: perform gauge frame RDS filtering on M_2 for
+      denoising.
+      3. `TV_enhancing_gauge`: perform gauge frame TR-TV flow on M_2 for
+      denoising.[4][5]
 
     References:
-      [1]: K. Schaefer and J. Weickert.
+      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
+      DOI:.
+      [2]: K. Schaefer and J. Weickert.
       "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
       DOI:10.1137/15M1018460.
-      [2]: K. Schaefer and J. Weickert.
+      [3]: K. Schaefer and J. Weickert.
       "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024).
       DOI:10.1007/s10851-024-01175-0.
+      [4]: A. Chambolle and Th. Pock.
+      "Total roto-translational variation." In: Numerische Mathematik (2019),
+      pp. 611--666.
+      DOI:10.1137/s00211-019-01026-w.
+      [5]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+      "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+      Positions and Orientations." In: Journal of Mathematical Imaging and
+      Vision (2021).
+      DOI:10.1007/s10851-020-00991-4.
 """
 
 import taichi as ti
@@ -47,14 +58,11 @@ from dsfilter.utils import (
 def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, gauge_frame_static, T, G_D_inv_np, G_S_inv_np, σ, ρ, ν, λ, ε=0.,
                  dxy=1.):
     """
-    Perform Diffusion-Shock inpainting in M_2, using an adaptation of the 
-    R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
-    Weickert.[1][2]
+    Perform gauge frame Diffusion-Shock filtering in M_2 for denoising.[1]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
-        `mask_np`: np.ndarray inpainting mask, with shape [Nx, Ny, Nθ], taking
-          values 0 and 1. Wherever the value is 1, no inpainting happens.
+        `ground_truth_np`: np.ndarray ground truth, with shape [Nx, Ny].
         `θs_np`: np.ndarray orientation coordinate θ throughout the domain.
         `T`: time that image is evolved under the DS PDE.
         `G_D_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
@@ -80,18 +88,13 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, gauge_frame_static, T, G_D_
     Returns:
         np.ndarray solution to the DS PDE with initial condition `u0_np` at
         time `T`.
-        TEMP: np.ndarray switch between diffusion and shock, and np.ndarray
-        switch between dilation and erosion.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     # Set hyperparameters
     shape = u0_np.shape
@@ -187,9 +190,7 @@ def step_DS(
     """
     @taichi.kernel
 
-    Perform a single timestep of M_2 Diffusion-Shock inpainting, adaptating
-    the R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
-    Weickert.[1][2]
+    Perform a single timestep of M_2 Diffusion-Shock filtering.[1]
 
     Args:
       Static:
@@ -213,14 +214,11 @@ def step_DS(
           single time step, not taking into account the mask.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     for I in ti.grouped(du_dt):
         du_dt[I] = (
@@ -236,7 +234,8 @@ def step_DS(
 
 def compute_timestep(dxy, dθ, G_D_inv, G_S_inv, ξ):
     """
-    Compute timestep to solve Diffusion-Shock PDE.
+    Compute timestep to solve Diffusion-Shock PDE,[1] such that the scheme
+    retains the maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -250,6 +249,13 @@ def compute_timestep(dxy, dθ, G_D_inv, G_S_inv, ξ):
     
     Returns:
         timestep, taking values greater than 0.
+
+    References:
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     τ_D = compute_timestep_diffusion(dxy, dθ, G_D_inv, ξ)
     τ_M = compute_timestep_shock(dxy, dθ, G_S_inv, ξ)
@@ -257,7 +263,8 @@ def compute_timestep(dxy, dθ, G_D_inv, G_S_inv, ξ):
 
 def compute_timestep_diffusion(dxy, dθ, G_D_inv, ξ):
     """
-    Compute timestep to solve Diffusion PDE.
+    Compute timestep to solve Diffusion PDE, such that the scheme retains the
+    maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -274,7 +281,8 @@ def compute_timestep_diffusion(dxy, dθ, G_D_inv, ξ):
 
 def compute_timestep_shock(dxy, dθ, G_S_inv, ξ):
     """
-    Compute timestep to solve Shock PDE.
+    Compute timestep to solve (Coherence-Enhancing) Shock PDE, such that the
+    scheme retains the maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -293,7 +301,8 @@ def compute_timestep_shock(dxy, dθ, G_S_inv, ξ):
 
 def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, ξ, dxy, dθ, gauge_frame_static, σ_s, σ_o, T, dt=None, λ=1.):
     """
-    Perform Total Roto-Translational Variation (TR-TV) Flow inpainting in M_2.
+    Perform gauge frame Total Roto-Translational Variation (TR-TV) Flow in M_2.
+    [1][2]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
@@ -315,6 +324,17 @@ def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, ξ, dxy, dθ, gauge_
     Returns:
         np.ndarray solution to the DS PDE with initial condition `u0_np` at
         time `T`.
+
+    References:
+        [1]: A. Chambolle and Th. Pock.
+          "Total roto-translational variation." In: Numerische Mathematik
+          (2019), pp. 611--666.
+          DOI:10.1137/s00211-019-01026-w.
+        [2]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+          "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+          Positions and Orientations." In: Journal of Mathematical Imaging and
+          Vision (2021).
+          DOI:10.1007/s10851-020-00991-4.
     """
     if dt is None:
         dt = compute_timestep_TV(dxy, dθ, G_inv_np, ξ)
