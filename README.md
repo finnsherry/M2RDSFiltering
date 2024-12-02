@@ -33,18 +33,18 @@ pip install -e .
 The main functionality is exposed as top level functions:
 | Method | Description |
 | ------ | ----------- |
-| `dsfilter.DS_enhancing_LI`    | left-invariant $\mathbb{M}_2$ RDS denoising |
-| `dsfilter.DS_enhancing_gauge` | gauge frame $\mathbb{M}_2$ RDS denoising |
-| `dsfilter.TV_enhancing_LI`    | left-invariant $\mathbb{M}_2$ T(R-T)V denoising |
-| `dsfilter.TV_enhancing_gauge` | gauge frame $\mathbb{M}_2$ T(R-T)V denoising |
-| `dsfilter.DS_inpainting_LI`   | left-invariant $\mathbb{M}_2$ RDS inpainting |
-| `dsfilter.DS_inpainting_R2`   | $\mathbb{R}^2$ RDS inpainting |
+| `dsfilter.DS_enhancing_LI`    | left-invariant $\mathbb{M}_2$ RDS denoising [[1]](#1) |
+| `dsfilter.DS_enhancing_gauge` | gauge frame $\mathbb{M}_2$ RDS denoising [[1]](#1) |
+| `dsfilter.DS_enhancing_R2`    | $\mathbb{R}^2$ RDS denoising [[2]](#2) |
+| `dsfilter.TV_enhancing_LI`    | left-invariant $\mathbb{M}_2$ T(R-T)V denoising [[3]](#3)[[4]](#4) |
+| `dsfilter.TV_enhancing_gauge` | gauge frame $\mathbb{M}_2$ T(R-T)V denoising [[3]](#3)[[4]](#4) |
+| `dsfilter.DS_inpainting_LI`   | left-invariant $\mathbb{M}_2$ RDS inpainting [[1]](#1) |
+| `dsfilter.DS_inpainting_R2`   | $\mathbb{R}^2$ RDS inpainting [[2]](#2) |
 
 ## Cite
 If you use this code in your own work, please cite our paper:
 
 <a id="1">[1]</a> Sherry, F.M., Schaefer, K., Duits, R. "Diffusion-Shock Filtering on the Space of Positions and Orientations." 10th International Conference on Scale Space and Variational Methods in Computer Vision (SSVM) (2025).
-
 ```
 @inproceedings{Sherry2025DSM2,
   author =       {Sherry, Finn M. and Schaefer, Kristina and Duits, Remco},
@@ -59,8 +59,9 @@ If you use this code in your own work, please cite our paper:
 }
 ```
 
-<a id="2">[2]</a> Schaefer, K., Weickert, J. "Regularised Diffusion-Shock Inpainting." Journal of Mathematical Imaging and Vision (2024). https://doi.org/10.1007/s10851-024-01175-0
+We extend RDS filtering on $\mathbb{R}^2$ by Schaefer & Weickert to $\mathbb{M}_2$:
 
+<a id="2">[2]</a> Schaefer, K., Weickert, J. "Regularised Diffusion-Shock Inpainting." Journal of Mathematical Imaging and Vision (2024). https://doi.org/10.1007/s10851-024-01175-0
 ```
 @article{Schaefer2024RDS,
   author =       {Schaefer, Kristina and Weickert, Joachim},
@@ -71,5 +72,35 @@ If you use this code in your own work, please cite our paper:
   volume =       {66},
   pages =        {447--463},
   doi =          {10.1007/s10851-024-01175-0}
+}
+```
+
+We compare to Total Roto-Translational Variation (TR-TV) flow by Chambolle & Pock and Smets et al.; this repository contains our own reimplementations:
+
+<a id="3">[3]</a> Chambolle, A., Pock, Th. "Total roto-translational variation." Numerische Mathematik (2019). https://doi.org/10.1007/s00211-019-01026-w
+```
+@article{Chambolle2019TRTV,
+  author =       {Chambolle, Antonin and Pock, Thomas},
+  title =        {{Total roto-translational variation}},
+  journal =      {Numerische Mathematik},
+  publisher =    {Springer},
+  year =         {2019},
+  volume =       {142},
+  pages =        {611--666},
+  doi =          {10.1007/s00211-019-01026-w}
+}
+```
+
+<a id="4">[4]</a> Smets, B.M.N., Portegies, J.W., St-Onge, E., Duits, R. "Total Variation and Mean Curvature PDEs on the Homogeneous Space of Positions and Orientations." Journal of Mathematical Imaging and Vision (2021). https://doi.org/10.1007/s10851-020-00991-4
+```
+@article{Smets2021TV,
+  author =       {Smets, Bart M.N. and Portegies, Jacobus W. and St-Onge, Etienne and Duits, Remco},
+  title =        {{Total Variation and Mean Curvature PDEs on the Homogeneous Space of Positions and Orientations}},
+  journal =      {Journal of Mathematical Imaging and Vision},
+  publisher =    {Springer},
+  year =         {2021},
+  volume =       {63},
+  pages =        {237--262},
+  doi =          {10.1007/s10851-020-00991-4}
 }
 ```
