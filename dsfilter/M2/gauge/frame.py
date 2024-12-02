@@ -13,7 +13,7 @@
       [1]: R. Duits, B.M.N. Smets, A.J. Wemmenhove, J.W. Portegies, and
       E. Bekkers.
       "Recent Geometric Flows in Multi-Orientation Image Processing via a Cartan
-      Connection". In: Handbook of Mathematical Models and Algorithms in
+      Connection." In: Handbook of Mathematical Models and Algorithms in
       Computer Vision and Imaging: Mathematical Imaging and Vision (2021),
       pp. 1--60.
       DOI:10.1007/978-3-030-98661-2_101.
@@ -56,12 +56,12 @@ def compute_gauge_frame_and_orientation_confidence(U, dxy, dθ, θs, ξ, ρ_s=1.
         [1]: R. Duits, B.M.N. Smets, A.J. Wemmenhove, J.W. Portegies, and
           E. Bekkers.
           "Recent Geometric Flows in Multi-Orientation Image Processing via a
-          Cartan Connection". In: Handbook of Mathematical Models and Algorithms
+          Cartan Connection." In: Handbook of Mathematical Models and Algorithms
           in Computer Vision and Imaging: Mathematical Imaging and Vision
           (2021), pp. 1--60.
           DOI:10.1007/978-3-030-98661-2_101.
         [2]: E.M. Franken. Supervised by B.M. ter Haar Romeny and R. Duits.
-          "Regularized Derivatives and Local Features", Ch. 5 in "Enhancement of
+          "Regularized Derivatives and Local Features," Ch. 5 in "Enhancement of
           Crossing Elongated Structures in Images" (2008), pp. 111--132.
           ISBN:978-90-384-1456-4.
     """
@@ -93,12 +93,12 @@ def compute_orientation_confidence(H, B2, B3):
         [1]: R. Duits, B.M.N. Smets, A.J. Wemmenhove, J.W. Portegies, and
           E. Bekkers.
           "Recent Geometric Flows in Multi-Orientation Image Processing via a
-          Cartan Connection". In: Handbook of Mathematical Models and Algorithms
+          Cartan Connection." In: Handbook of Mathematical Models and Algorithms
           in Computer Vision and Imaging: Mathematical Imaging and Vision
           (2021), pp. 1--60.
           DOI:10.1007/978-3-030-98661-2_101.
         [2]: E.M. Franken. Supervised by B.M. ter Haar Romeny and R. Duits.
-          "Regularized Derivatives and Local Features", Ch. 5 in "Enhancement of
+          "Regularized Derivatives and Local Features," Ch. 5 in "Enhancement of
           Crossing Elongated Structures in Images" (2008), pp. 111--132.
           ISBN:978-90-384-1456-4.
     """
@@ -157,7 +157,7 @@ def compute_gauge_frame(H, ξ, ρ_s=1., ρ_o=0.5):
         [1]: R. Duits, B.M.N. Smets, A.J. Wemmenhove, J.W. Portegies, and
           E. Bekkers.
           "Recent Geometric Flows in Multi-Orientation Image Processing via a
-          Cartan Connection". In: Handbook of Mathematical Models and Algorithms
+          Cartan Connection." In: Handbook of Mathematical Models and Algorithms
           in Computer Vision and Imaging: Mathematical Imaging and Vision
           (2021), pp. 1--60.
           DOI:10.1007/978-3-030-98661-2_101.
@@ -228,7 +228,7 @@ def compute_Hessian(U, dxy, dθ, θs, σ=1.):
         [1]: R. Duits, B.M.N. Smets, A.J. Wemmenhove, J.W. Portegies, and
           E. Bekkers.
           "Recent Geometric Flows in Multi-Orientation Image Processing via a
-          Cartan Connection". In: Handbook of Mathematical Models and Algorithms
+          Cartan Connection." In: Handbook of Mathematical Models and Algorithms
           in Computer Vision and Imaging: Mathematical Imaging and Vision
           (2021), pp. 1--60.
           DOI:10.1007/978-3-030-98661-2_101.

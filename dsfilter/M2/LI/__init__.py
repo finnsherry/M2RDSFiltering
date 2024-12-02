@@ -2,10 +2,10 @@
     M2
     ==
 
-    Apply Diffusion-Shock filtering on M_2 using left invariant vector fields.
+    Apply left-invariant Diffusion-Shock filtering on M_2.
 
     Provides the following "top level" submodule:
-      1. filter: apply the Diffusion-Shock filter to an image on M_2.
+      1. filter: perform left-invariant RDS filtering on M_2.
 
     Additionally, we have the following "internal" submodules
       1. derivatives: compute various derivatives of functions on M_2.

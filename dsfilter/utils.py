@@ -98,7 +98,7 @@ def S_ε(
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
           DOI:10.1007/s10851-024-01175-0.
     """
@@ -124,7 +124,7 @@ def g_scalar(
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
           DOI:10.1007/s10851-024-01175-0.
     """

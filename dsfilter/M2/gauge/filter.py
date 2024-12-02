@@ -2,24 +2,24 @@
     filter
     ======
 
-    Provides methods to apply SE(2) Diffusion-Shock inpainting using gauge
+    Provides methods to apply M_2 Diffusion-Shock inpainting using gauge
     frames, inspired by the Diffusion-Shock inpainting on R^2 by K. Schaefer and
     J. Weickert.[1][2]
     The primary methods are:
-      1. `DS_filter_lines`: apply SE(2) Diffusion-Shock inpainting to an array
+      1. `DS_filter_lines`: apply M_2 Diffusion-Shock inpainting to an array
       describing an image consisting of lines, given an inpainting mask and
       various PDE parameters.
-      1. `DS_filter_planes`: apply SE(2) Diffusion-Shock inpainting to an array
+      1. `DS_filter_planes`: apply M_2 Diffusion-Shock inpainting to an array
       describing an image consisting of lines and flat areas, given an
       inpainting mask and various PDE parameters.
 
     References:
       [1]: K. Schaefer and J. Weickert.
-      "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods in
+      "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
       DOI:10.1137/15M1018460.
       [2]: K. Schaefer and J. Weickert.
-      "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+      "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024).
       DOI:10.1007/s10851-024-01175-0.
 """
@@ -47,7 +47,7 @@ from dsfilter.utils import (
 def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, gauge_frame_static, T, G_D_inv_np, G_S_inv_np, σ, ρ, ν, λ, ε=0.,
                  dxy=1.):
     """
-    Perform Diffusion-Shock inpainting in SE(2), using an adaptation of the 
+    Perform Diffusion-Shock inpainting in M_2, using an adaptation of the 
     R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
     Weickert.[1][2]
 
@@ -85,11 +85,11 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, gauge_frame_static, T, G_D_
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
+          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
           DOI:10.1137/15M1018460.
         [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
           DOI:10.1007/s10851-024-01175-0.
     """
@@ -187,7 +187,7 @@ def step_DS(
     """
     @taichi.kernel
 
-    Perform a single timestep of SE(2) Diffusion-Shock inpainting, adaptating
+    Perform a single timestep of M_2 Diffusion-Shock inpainting, adaptating
     the R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
     Weickert.[1][2]
 
@@ -214,11 +214,11 @@ def step_DS(
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
+          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
           DOI:10.1137/15M1018460.
         [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
           DOI:10.1007/s10851-024-01175-0.
     """
@@ -293,7 +293,7 @@ def compute_timestep_shock(dxy, dθ, G_S_inv, ξ):
 
 def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, ξ, dxy, dθ, gauge_frame_static, σ_s, σ_o, T, dt=None, λ=1.):
     """
-    Perform Total Roto-Translation Variation (TR-TV) Flow inpainting in SE(2).
+    Perform Total Roto-Translational Variation (TR-TV) Flow inpainting in M_2.
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
@@ -375,7 +375,7 @@ def step_TV(
     """
     @taichi.kernel
 
-    Perform a single timestep of SE(2) Shock inpainting.
+    Perform a single timestep of M_2 Shock inpainting.
 
     Args:
       Static:

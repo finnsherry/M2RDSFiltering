@@ -5,7 +5,7 @@
     Apply Diffusion-Shock filtering on R^2.
 
     Provides the following "top level" submodule:
-      1. filter: apply the Diffusion-Shock filter to an image on R^2.
+      1. filter: perform RDS filtering on R^2.
 
     Additionally, we have the following "internal" submodules
       1. derivatives: compute various derivatives of functions on R^2.

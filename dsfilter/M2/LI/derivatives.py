@@ -2,9 +2,28 @@
     derivatives
     ===========
 
-    Provides a variety of derivative operators on SE(2), namely:
-      1. `laplacian`: 
-      2. `morphological`: 
+    Provides a variety of derivative operators on M_2, namely:
+      1. `laplacian`: computes an approximation of the 0 Lie-Cartan Laplacian
+      given some left-invariant metric tensor field, see Eq. (9) in [1].
+      2. `morphological`: computes approximations of the dilation and erosion
+      operators +/- ||grad u||, see Eq. (10) in [1].
+      3. `TV`: computes an approximation of the total roto-translational
+      generator div(grad u/||grad u||).
+
+    References:
+      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
+      DOI:.
+      [2]: A. Chambolle and Th. Pock.
+      "Total roto-translational variation." In: Numerische Mathematik (2019),
+      pp. 611--666.
+      DOI:10.1007/s00211-019-01026-w.
+      [3]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+      "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+      Positions and Orientations." In: Journal of Mathematical Imaging and
+      Vision (2021), pp. 237-262.
+      DOI:10.1007/s10851-020-00991-4.
 """
 
 import taichi as ti
@@ -411,8 +430,8 @@ def TV(
     """
     @taichi.kernel
 
-    Compute an approximation of the Total Variation (TV) operator applied to `u`
-    using central differences.
+    Compute an approximation of the Total Roto-Translational Variation (TR-TV)
+    operator applied to `u` using central differences.[1]
 
     Args:
       Static:
@@ -427,6 +446,13 @@ def TV(
       Mutated:
         `TV_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) laplacian of
           u, which is updated in place.
+
+    References:
+        [1]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+          "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+          Positions and Orientations." In: Journal of Mathematical Imaging and
+          Vision (2021), pp. 237-262.
+          DOI:10.1007/s10851-020-00991-4.
     """
     I_A3 = ti.Vector([0.0,  0.0, 1.0], dt=ti.f32) / 2
     for I in ti.grouped(A1_u):

@@ -11,7 +11,7 @@
 
     References:
       [1]: K. Schaefer and J. Weickert.
-      "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods in
+      "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
       DOI:10.1137/15M1018460.
 """
@@ -51,7 +51,7 @@ def laplacian(
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
+          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
           DOI:10.1137/15M1018460.
     """
@@ -112,7 +112,7 @@ def morphological(
           
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
+          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
           DOI:10.1137/15M1018460.
     """

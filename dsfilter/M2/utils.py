@@ -3,7 +3,7 @@
     =====
 
     Provides miscellaneous computational utilities that can be used with all
-    controllers on SE(2).
+    controllers on M_2.
 """
 
 import numpy as np
@@ -39,7 +39,7 @@ def project_down(
     """
     @taichi.kernel
 
-    Project orientation score `U` on SE(2) down to a function `u` on R^2 by
+    Project orientation score `U` on M_2 down to a function `u` on R^2 by
     integrating over orientations.
 
     Args:

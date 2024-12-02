@@ -13,11 +13,11 @@
 
     References:
       [1]: K. Schaefer and J. Weickert.
-      "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods in
+      "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
       DOI:10.1137/15M1018460.
       [2]: K. Schaefer and J. Weickert.
-      "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+      "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024).
       DOI:10.1007/s10851-024-01175-0.
 """
@@ -94,11 +94,11 @@ def DS_switch(
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
+          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
           DOI:10.1137/15M1018460.
         [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
           DOI:10.1007/s10851-024-01175-0.
     """
@@ -110,10 +110,6 @@ def DS_switch(
     gradient_perp(switch, dxy, dθ, ξ, B2, B3, gradient_perp_u)
     for I in ti.grouped(switch):
         switch[I] = g_scalar(gradient_perp_u[I]**2, λ)
-    # # Finally regularise externally with Gaussian convolution.
-    # convolve_with_kernel_x_dir(switch, k_s, radius_s, gradient_perp_u)
-    # convolve_with_kernel_y_dir(gradient_perp_u, k_s, radius_s, storage)
-    # convolve_with_kernel_θ_dir(storage, k_o, radius_o, switch)
 
 # Morphological
 
@@ -183,11 +179,11 @@ def morphological_switch(
 
     References:
         [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
+          "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
           DOI:10.1137/15M1018460.
         [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+          "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
           DOI:10.1007/s10851-024-01175-0.
     """

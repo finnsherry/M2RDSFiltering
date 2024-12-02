@@ -15,7 +15,7 @@
       E. Wernersson, F. Malmberg, S. Lokhorst, M. Wolff, G. van Kempen,
       M. van Ginkel, L. van Vliet, B. Rieger, B. Verwer, H. Netten,
       J. W. Brandenburg, J. Dijk, N. van den Brink, F. Faas, K. van Wijk,
-      and T. Pham. "DIPlib 3". GitHub: https://github.com/DIPlib/diplib.
+      and T. Pham. "DIPlib 3." GitHub: https://github.com/DIPlib/diplib.
 """
 
 import taichi as ti
@@ -102,7 +102,7 @@ def gaussian_kernel(σ, truncate=5., dxy=1.):
           E. Wernersson, F. Malmberg, S. Lokhorst, M. Wolff, G. van Kempen,
           M. van Ginkel, L. van Vliet, B. Rieger, B. Verwer, H. Netten,
           J. W. Brandenburg, J. Dijk, N. van den Brink, F. Faas, K. van Wijk,
-          and T. Pham. "DIPlib 3". GitHub: https://github.com/DIPlib/diplib.
+          and T. Pham. "DIPlib 3." GitHub: https://github.com/DIPlib/diplib.
     """
     radius = int(σ * truncate + 0.5)
     k = ti.field(dtype=ti.f32, shape=2*radius+1)
@@ -136,7 +136,7 @@ def gaussian_kernel_ti(
           E. Wernersson, F. Malmberg, S. Lokhorst, M. Wolff, G. van Kempen,
           M. van Ginkel, L. van Vliet, B. Rieger, B. Verwer, H. Netten,
           J. W. Brandenburg, J. Dijk, N. van den Brink, F. Faas, K. van Wijk,
-          and T. Pham. "DIPlib 3". GitHub: https://github.com/DIPlib/diplib.
+          and T. Pham. "DIPlib 3." GitHub: https://github.com/DIPlib/diplib.
     """
     for i in range(2*radius+1):
         x = -radius + i

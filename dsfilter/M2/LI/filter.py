@@ -2,25 +2,37 @@
     filter
     ======
 
-    Provides methods to apply M_2 Diffusion-Shock inpainting, inspired by the
-    Diffusion-Shock inpainting on R^2 by K. Schaefer and J. Weickert.[1][2]
+    Provides methods to apply M_2 Diffusion-Shock filtering,[1] inspired by the
+    Diffusion-Shock filtering on R^2 by K. Schaefer and J. Weickert.[2][3]
     The primary methods are:
-      1. `DS_filter_lines`: apply M_2 Diffusion-Shock inpainting to an array
-      describing an image consisting of lines, given an inpainting mask and
-      various PDE parameters.
-      1. `DS_filter_planes`: apply M_2 Diffusion-Shock inpainting to an array
-      describing an image consisting of lines and flat areas, given an
-      inpainting mask and various PDE parameters.
+      1. `DS_enhancing_LI`: perform left-invariant RDS filtering on M_2 for
+      denoising.
+      2. `DS_inpainting_LI`: perform left-invariant RDS inpainting on M_2.
+      3. `TV_enhancing_LI`: perform left-invariant TR-TV flow on M_2 for
+      denoising.[4][5]
 
     References:
-      [1]: K. Schaefer and J. Weickert.
-      "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods in
+      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
+      DOI:.
+      [2]: K. Schaefer and J. Weickert.
+      "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
       DOI:10.1137/15M1018460.
-      [2]: K. Schaefer and J. Weickert.
-      "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
+      [3]: K. Schaefer and J. Weickert.
+      "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024).
       DOI:10.1007/s10851-024-01175-0.
+      [4]: A. Chambolle and Th. Pock.
+      "Total roto-translational variation." In: Numerische Mathematik (2019),
+      pp. 611--666.
+      DOI:10.1137/s00211-019-01026-w.
+      [5]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+      "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+      Positions and Orientations." In: Journal of Mathematical Imaging and
+      Vision (2021).
+      DOI:10.1007/s10851-020-00991-4.
 """
 
 import taichi as ti
@@ -49,15 +61,15 @@ from dsfilter.utils import (
 
 def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, σ, ρ, ν, λ, ε=0., dxy=1.):
     """
-    Perform Diffusion-Shock inpainting in SE(2), using an adaptation of the 
-    R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
-    Weickert.[1][2]
+    Perform left-invariant Diffusion-Shock filtering in M_2 for denoising.[1]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
-        `mask_np`: np.ndarray inpainting mask, with shape [Nx, Ny, Nθ], taking
-          values 0 and 1. Wherever the value is 1, no inpainting happens.
+        `ground_truth_np`: np.ndarray ground truth, with shape [Nx, Ny].
         `θs_np`: np.ndarray orientation coordinate θ throughout the domain.
+        `ξ`: stiffness parameter defining the cost of moving one unit in the
+          orientatonal direction relative to moving one unit in a spatial
+          direction, taking values greater than 0.
         `T`: time that image is evolved under the DS PDE.
         `G_D_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
@@ -65,12 +77,15 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, 
         `G_S_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
           basis used to define the shock.
-        `σ_*`: standard deviation in the A*-direction of the internal
-          regularisation, taking values greater than 0.
-        `ρ_*`: standard deviation in the A*-direction of the external
-          regularisation, taking values greater than 0.
-        `ν_*`: standard deviation in the A*-direction of the internal and
-          external regularisation, taking values greater than 0.
+        `σ`: standard deviation in the spatial-direction of the internal
+          regularisation on the switch between dilation and erosion, taking
+          values greater than 0.
+        `ρ`: standard deviation in the spatial-direction of the external
+          regularisation on the switch between dilation and erosion, taking
+          values greater than 0.
+        `ν`: standard deviation in the spatial-direction of the internal
+          regularisation on the switch between diffusion and shock, taking
+          values greater than 0.
         `λ`: contrast parameter used to determine whether to perform diffusion
           or shock based on the degree of local orientation.
         
@@ -82,18 +97,13 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, 
     Returns:
         np.ndarray solution to the DS PDE with initial condition `u0_np` at
         time `T`.
-        TEMP: np.ndarray switch between diffusion and shock, and np.ndarray
-        switch between dilation and erosion.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     # Set hyperparameters
     shape = u0_np.shape
@@ -170,9 +180,7 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, 
 
 def DS_inpainting(u0_np, mask_np, θs_np, T, G_D_inv_np, G_S_inv_np, σ_s, σ_o, ρ_s, ρ_o, ν_s, ν_o, λ, ε=0., dxy=1.):
     """
-    Perform Diffusion-Shock inpainting in M_2, using an adaptation of the 
-    R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
-    Weickert.[1][2]
+    Perform left-invariant Diffusion-Shock inpainting in M_2.[1]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
@@ -215,18 +223,13 @@ def DS_inpainting(u0_np, mask_np, θs_np, T, G_D_inv_np, G_S_inv_np, σ_s, σ_o,
     Returns:
         np.ndarray solution to the DS PDE with initial condition `u0_np` at
         time `T`.
-        TEMP: np.ndarray switch between diffusion and shock, and np.ndarray
-        switch between dilation and erosion.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     # Set hyperparameters
     shape = u0_np.shape
@@ -301,9 +304,7 @@ def step_DS(
     """
     @taichi.kernel
 
-    Perform a single timestep of SE(2) Diffusion-Shock inpainting, adaptating
-    the R^2 Diffusion-Shock inpainting algorithm described by Schaefer and
-    Weickert.[1][2]
+    Perform a single timestep of M_2 Diffusion-Shock filtering.[1]
 
     Args:
       Static:
@@ -328,14 +329,11 @@ def step_DS(
           single time step, not taking into account the mask.
 
     References:
-        [1]: K. Schaefer and J. Weickert.
-          "Diffusion-Shock Inpainting". In: Scale Space and Variational Methods
-          in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
-        [2]: K. Schaefer and J. Weickert.
-          "Regularised Diffusion-Shock Inpainting". In: Journal of Mathematical
-          Imaging and Vision (2024).
-          DOI:10.1007/s10851-024-01175-0.
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     for I in ti.grouped(du_dt):
         du_dt[I] = (
@@ -351,7 +349,8 @@ def step_DS(
 
 def compute_timestep(dxy, dθ, G_D_inv, G_S_inv):
     """
-    Compute timestep to solve Diffusion-Shock PDE.
+    Compute timestep to solve Diffusion-Shock PDE,[1] such that the scheme
+    retains the maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -365,6 +364,13 @@ def compute_timestep(dxy, dθ, G_D_inv, G_S_inv):
     
     Returns:
         timestep, taking values greater than 0.
+
+    References:
+        [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+          "Diffusion-Shock Filtering on the Space of Positions and
+          Orientations." In: Scale Space and Variational Methods in Computer
+          Vision (2025), pp. .
+          DOI:.
     """
     τ_D = compute_timestep_diffusion(dxy, dθ, G_D_inv)
     τ_M = compute_timestep_shock(dxy, dθ, G_S_inv)
@@ -372,7 +378,8 @@ def compute_timestep(dxy, dθ, G_D_inv, G_S_inv):
 
 def compute_timestep_diffusion(dxy, dθ, G_D_inv):
     """
-    Compute timestep to solve Diffusion PDE.
+    Compute timestep to solve Diffusion PDE, such that the scheme retains the
+    maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -388,7 +395,8 @@ def compute_timestep_diffusion(dxy, dθ, G_D_inv):
 
 def compute_timestep_shock(dxy, dθ, G_S_inv):
     """
-    Compute timestep to solve Shock PDE.
+    Compute timestep to solve (Coherence-Enhancing) Shock PDE, such that the
+    scheme retains the maximum-minimum principle of the continuous PDE.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
@@ -407,7 +415,7 @@ def compute_timestep_shock(dxy, dθ, G_S_inv):
 
 def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, dxy, dθ, θs_np, σ_s, σ_o, T, dt=None, λ=1.):
     """
-    Perform Total Roto-Translation Variation (TR-TV) Flow in SE(2).
+    Perform Total Roto-Translational Variation (TR-TV) Flow in M_2.[1][2]
 
     Args:
         `u0_np`: np.ndarray initial condition, with shape [Nx, Ny, Nθ].
@@ -429,6 +437,17 @@ def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, dxy, dθ, θs_np, σ
     Returns:
         np.ndarray solution to the TV Flow PDE with initial condition `u0_np` at
         time `T`.
+
+    References:
+        [1]: A. Chambolle and Th. Pock.
+          "Total roto-translational variation." In: Numerische Mathematik
+          (2019), pp. 611--666.
+          DOI:10.1137/s00211-019-01026-w.
+        [2]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+          "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+          Positions and Orientations." In: Journal of Mathematical Imaging and
+          Vision (2021).
+          DOI:10.1007/s10851-020-00991-4.
     """
     if dt is None:
         dt = compute_timestep_TV(dxy, dθ, G_inv_np)
@@ -484,7 +503,7 @@ def step_TV(
     """
     @taichi.kernel
 
-    Perform a single timestep of SE(2) Shock inpainting.
+    Perform a single timestep of TR-TV flow.
 
     Args:
       Static:
@@ -500,14 +519,14 @@ def step_TV(
 
 def compute_timestep_TV(dxy, dθ, G_inv):
     """
-    Compute timestep to solve TV flow.
+    Compute timestep to solve TR-TV flow.
     
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
         `dθ`: step size in θ direction, taking values greater than 0.
         `G_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
-          basis used to define the TV flow.
+          basis used to define the TR-TV flow.
     
     Returns:
         timestep, taking values greater than 0.

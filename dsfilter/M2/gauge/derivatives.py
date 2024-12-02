@@ -2,7 +2,7 @@
     derivatives
     ===========
 
-    Provides a variety of derivative operators on SE(2), namely:
+    Provides a variety of derivative operators on M_2, namely:
       1. `laplacian`: 
       2. `morphological`: 
 """

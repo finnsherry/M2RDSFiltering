@@ -11,7 +11,7 @@
       the θ-direction.
       4. `gaussian_kernel`: computes 1D Gaussian kernels using an algorithm
       based on the DIPlib[2] algorithm MakeHalfGaussian: https://github.com/DIPlib/diplib/blob/a6f825a69109ae388c5f0c14e76cdb2505da4594/src/linear/gauss.cpp#L95.
-    We use that the spatially isotropic diffusion equation on SE(2) can be
+    We use that the spatially isotropic diffusion equation on M_2 can be
     solved by convolving in the x-, y-, and θ-direction with some 1D kernel. For
     the x- and y-directions, this kernel is a Gaussian; for the θ-direction the
     kernel looks like a Gaussian if the amount of diffusion is sufficiently
@@ -22,9 +22,9 @@
       E. Wernersson, F. Malmberg, S. Lokhorst, M. Wolff, G. van Kempen,
       M. van Ginkel, L. van Vliet, B. Rieger, B. Verwer, H. Netten,
       J. W. Brandenburg, J. Dijk, N. van den Brink, F. Faas, K. van Wijk,
-      and T. Pham. "DIPlib 3". GitHub: https://github.com/DIPlib/diplib.
+      and T. Pham. "DIPlib 3." GitHub: https://github.com/DIPlib/diplib.
       [2]: G. Bellaard, D.L.J. Bon, G. Pai, B.M.N. Smets, and R. Duits.
-      "Analysis of (sub-)Riemannian PDE-G-CNNs". In: Journal of Mathematical
+      "Analysis of (sub-)Riemannian PDE-G-CNNs." In: Journal of Mathematical
       Imaging and Vision 65 (2023), pp. 819--843.
       DOI:10.1007/s10851-023-01147-w.
 """
@@ -57,7 +57,7 @@ def gaussian_kernel(σ, truncate=5., dxy=1.):
           E. Wernersson, F. Malmberg, S. Lokhorst, M. Wolff, G. van Kempen,
           M. van Ginkel, L. van Vliet, B. Rieger, B. Verwer, H. Netten,
           J. W. Brandenburg, J. Dijk, N. van den Brink, F. Faas, K. van Wijk,
-          and T. Pham. "DIPlib 3". GitHub: https://github.com/DIPlib/diplib.
+          and T. Pham. "DIPlib 3." GitHub: https://github.com/DIPlib/diplib.
     """
     radius = int(σ * truncate / dxy + 0.5)
     k = ti.field(dtype=ti.f32, shape=2*radius+1)
@@ -91,7 +91,7 @@ def gaussian_kernel_ti(
           E. Wernersson, F. Malmberg, S. Lokhorst, M. Wolff, G. van Kempen,
           M. van Ginkel, L. van Vliet, B. Rieger, B. Verwer, H. Netten,
           J. W. Brandenburg, J. Dijk, N. van den Brink, F. Faas, K. van Wijk,
-          and T. Pham. "DIPlib 3". GitHub: https://github.com/DIPlib/diplib.
+          and T. Pham. "DIPlib 3." GitHub: https://github.com/DIPlib/diplib.
     """
     for i in range(2*radius+1):
         x = -radius + i
