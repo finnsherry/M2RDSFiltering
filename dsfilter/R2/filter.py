@@ -13,7 +13,7 @@
       [1]: K. Schaefer and J. Weickert.
       "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
-      DOI:10.1137/15M1018460.
+      DOI:10.1007/978-3-031-31975-4_45.
       [2]: K. Schaefer and J. Weickert.
       "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024), pp. 447--463.
@@ -71,7 +71,7 @@ def DS_enhancing(u0_np, ground_truth_np, T, σ, ρ, ν, λ, ε=0., dxy=1., max_v
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
@@ -179,7 +179,7 @@ def DS_inpainting(u0_np, mask_np, T, σ, ρ, ν, λ, ε=0., dxy=1.):
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
@@ -265,7 +265,7 @@ def compute_timestep(dxy, δ=np.sqrt(2)-1):
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
@@ -296,7 +296,7 @@ def compute_timestep_diffusion(dxy, δ=np.sqrt(2)-1):
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
@@ -325,7 +325,7 @@ def compute_timestep_shock(dxy, δ=np.sqrt(2)-1):
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
@@ -378,7 +378,7 @@ def step_DS(
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).

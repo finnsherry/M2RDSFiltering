@@ -15,7 +15,7 @@
       [1]: K. Schaefer and J. Weickert.
       "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
-      DOI:10.1137/15M1018460.
+      DOI:10.1007/978-3-031-31975-4_45.
       [2]: K. Schaefer and J. Weickert.
       "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024).
@@ -74,7 +74,7 @@ def DS_switch(
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).
@@ -155,7 +155,7 @@ def morphological_switch(
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
         [2]: K. Schaefer and J. Weickert.
           "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
           Imaging and Vision (2024).

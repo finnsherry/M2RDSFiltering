@@ -13,7 +13,7 @@
       [1]: K. Schaefer and J. Weickert.
       "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
-      DOI:10.1137/15M1018460.
+      DOI:10.1007/978-3-031-31975-4_45.
 """
 
 import taichi as ti
@@ -53,7 +53,7 @@ def laplacian(
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
     """
     δ = ti.math.sqrt(2) - 1 # Good value for rotation invariance according to M. Welk and J. Weickert (2021)
     I_dx = ti.Vector([1, 0], dt=ti.i32)
@@ -114,7 +114,7 @@ def morphological(
         [1]: K. Schaefer and J. Weickert.
           "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods
           in Computer Vision 14009 (2023), pp. 588--600.
-          DOI:10.1137/15M1018460.
+          DOI:10.1007/978-3-031-31975-4_45.
     """
     δ = ti.math.sqrt(2) - 1 # Good value for rotation invariance according to M. Welk and J. Weickert (2021)
     I_dx = ti.Vector([1, 0], dt=ti.i32)

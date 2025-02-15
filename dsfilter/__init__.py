@@ -28,7 +28,7 @@
       [2]: K. Schaefer and J. Weickert.
       "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
       Computer Vision 14009 (2023), pp. 588--600.
-      DOI:10.1137/15M1018460.
+      DOI:10.1007/978-3-031-31975-4_45.
       [3]: K. Schaefer and J. Weickert.
       "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
       Imaging and Vision (2024).
@@ -36,7 +36,7 @@
       [4]: A. Chambolle and Th. Pock.
       "Total roto-translational variation." In: Numerische Mathematik (2019),
       pp. 611--666.
-      DOI:10.1137/s00211-019-01026-w.
+      DOI:10.1007/s00211-019-01026-w.
       [5]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
       "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
       Positions and Orientations." In: Journal of Mathematical Imaging and

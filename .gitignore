@@ -1,6 +1,6 @@
 __pycache__/
 test*
-old*
+*old*
 
 output
 *.egg*

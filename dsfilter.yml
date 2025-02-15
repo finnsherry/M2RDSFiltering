@@ -252,3 +252,4 @@ dependencies:
       - rich==13.9.4
       - taichi==1.6.0
       - tqdm==4.67.1
+prefix: C:\Users\20182244\AppData\Local\miniforge3\envs\dsfilter
