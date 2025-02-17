@@ -36,7 +36,7 @@
       [4]: A. Chambolle and Th. Pock.
       "Total roto-translational variation." In: Numerische Mathematik (2019),
       pp. 611--666.
-      DOI:10.1007/s00211-019-01026-w.
+      DOI:10.1137/s00211-019-01026-w.
       [5]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
       "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
       Positions and Orientations." In: Journal of Mathematical Imaging and
