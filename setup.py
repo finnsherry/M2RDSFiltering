@@ -12,7 +12,7 @@ setuptools.setup(
     description="Enhance images using Diffusion-Shock Filtering",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/finn491/DiffusionShockInpainting",
+    url="https://github.com/finnsherry/M2RDSFiltering",
     packages=setuptools.find_packages(),
     package_data={'dsfilter' : ['lib/*']},
     install_requires=install_requires,

@@ -55,7 +55,7 @@ If you use this code in your own work, please cite our paper:
   address =      {Totnes, United Kingdom},
   pages =        {},
   doi =          {},
-  editor =       {}
+  editor =       {Bubba, Tatiana and Papafitsoros, Kostas and Gazzola, Silvia and Pereyra, Marcelo and Gaburro, Romina and Schönlieb, Carola}
 }
 ```
 
