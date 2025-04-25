@@ -164,6 +164,7 @@ def cakewavelet_stack_fourier(N_spatial, dθ, spline_order, overlap_factor, infl
 
     xs = mod_offset(θs_grid[None, ...] - θs[..., None, None] - np.pi / 2, 2 * np.pi, -np.pi) / dθ
     filters = window[None, ...] * B_spline(spline_order, xs)
+    filters[:, (N_spatial//2 - 2):(N_spatial//2 + 3), (N_spatial//2 - 2):(N_spatial//2 + 3)] = dθ / (2 * np.pi)
     return filters
 
 def cakewavelet_stack(N_spatial, Nθ, inflection_point=0.8, mn_order=8, spline_order=3, overlap_factor=1,
@@ -195,8 +196,6 @@ def cakewavelet_stack(N_spatial, Nθ, inflection_point=0.8, mn_order=8, spline_o
         Gaussian_σ = (N_spatial - 1) / 4
     dθ = 2 * np.pi / Nθ
     cake_fourier = cakewavelet_stack_fourier(N_spatial, dθ, spline_order, overlap_factor, inflection_point, mn_order)
-
-    cake_fourier[:, (N_spatial//2 - 5):(N_spatial//2 + 6), (N_spatial//2 - 5):(N_spatial//2 + 6)] = dθ / (2 * np.pi)
 
     cake = np.zeros_like(cake_fourier, dtype=np.complex128)
     rotation_amount = np.array((N_spatial // 2, N_spatial // 2))
