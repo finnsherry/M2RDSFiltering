@@ -1,41 +1,37 @@
 """
-    switches
-    ========
+switches
+========
 
-    Provides the operators to switch between diffusion and shock, and between
-    dilation and erosion, as described in [1].
-    The primary methods are:
-      1. `DS_switch`: switches between diffusion and shock. If there is locally
-      a clear orientation, more shock is applied, see Eq. (7) in [1].
-      2. `morphological_switch`: switches between dilation and erosion. If the
-      data is locally convex, erosion is applied, while if the data is locally
-      concave, dilation is applied, see Eq. (4) in [1].
+Provides the operators to switch between diffusion and shock, and between
+dilation and erosion, as described in [1].
+The primary methods are:
+  1. `DS_switch`: switches between diffusion and shock. If there is locally
+  a clear orientation, more shock is applied, see Eq. (7) in [1].
+  2. `morphological_switch`: switches between dilation and erosion. If the
+  data is locally convex, erosion is applied, while if the data is locally
+  concave, dilation is applied, see Eq. (4) in [1].
 
-    References:
-      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
-      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
-      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
-      DOI:.
+References:
+  [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+  "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+  In: Scale Space and Variational Methods in Computer Vision (2025),
+  pp. 205--217.
+  DOI:10.1007/978-3-031-92369-2_16.
 """
 
 import taichi as ti
 from dsfilter.M2.regularisers import (
     convolve_with_kernel_x_dir,
     convolve_with_kernel_y_dir,
-    convolve_with_kernel_θ_dir
+    convolve_with_kernel_θ_dir,
 )
-from dsfilter.M2.gauge.derivatives import (
-    laplace_perp,
-    gradient_perp
-)
-from dsfilter.utils import (
-    S_ε,
-    g_scalar
-)
+from dsfilter.M2.gauge.derivatives import laplace_perp, gradient_perp
+from dsfilter.utils import S_ε, g_scalar
 
 # Isotropic
 
 # Diffusion-Shock
+
 
 @ti.kernel
 def DS_switch(
@@ -52,7 +48,7 @@ def DS_switch(
     B3: ti.template(),
     gradient_perp_u: ti.template(),
     switch: ti.template(),
-    storage: ti.template()
+    storage: ti.template(),
 ):
     """
     @taichi.kernel
@@ -92,8 +88,8 @@ def DS_switch(
         [1]: F.M. Sherry, K. Schaefer, and R. Duits.
           "Diffusion-Shock Filtering on the Space of Positions and
           Orientations." In: Scale Space and Variational Methods in Computer
-          Vision (2025), pp. .
-          DOI:.
+          Vision (2025), pp. 205--217.
+          DOI:10.1007/978-3-031-92369-2_16.
     """
     # First regularise internally with Gaussian convolution.
     convolve_with_kernel_x_dir(u, k_s, radius_s, switch)
@@ -102,9 +98,11 @@ def DS_switch(
     # Then compute perpendicular gradient, which is a measure for lineness.
     gradient_perp(switch, dxy, dθ, ξ, B2, B3, gradient_perp_u)
     for I in ti.grouped(switch):
-        switch[I] = g_scalar(gradient_perp_u[I]**2, λ)
+        switch[I] = g_scalar(gradient_perp_u[I] ** 2, λ)
+
 
 # Morphological
+
 
 @ti.kernel
 def morphological_switch(
@@ -125,7 +123,7 @@ def morphological_switch(
     B3: ti.template(),
     laplace_perp_u: ti.template(),
     switch: ti.template(),
-    storage: ti.template()
+    storage: ti.template(),
 ):
     """
     @taichi.kernel
@@ -174,8 +172,8 @@ def morphological_switch(
         [1]: F.M. Sherry, K. Schaefer, and R. Duits.
           "Diffusion-Shock Filtering on the Space of Positions and
           Orientations." In: Scale Space and Variational Methods in Computer
-          Vision (2025), pp. .
-          DOI:.
+          Vision (2025), pp. 205--217.
+          DOI:10.1007/978-3-031-92369-2_16.
     """
     # First regularise internally with Gaussian convolution.
     convolve_with_kernel_x_dir(u, k_int_s, radius_int_s, switch)
@@ -184,7 +182,9 @@ def morphological_switch(
     # Then compute perpendicular laplacian, which is a measure for convexity.
     laplace_perp(switch, dxy, dθ, ξ, B2, B3, laplace_perp_u)
     for I in ti.grouped(switch):
-        switch[I] = (ε > 0.) * S_ε(laplace_perp_u[I], ε) + (ε == 0.) * ti.math.sign(laplace_perp_u[I])
+        switch[I] = (ε > 0.0) * S_ε(laplace_perp_u[I], ε) + (ε == 0.0) * ti.math.sign(
+            laplace_perp_u[I]
+        )
     # Finally regularise externally with Gaussian convolution.
     convolve_with_kernel_x_dir(switch, k_ext_s, radius_ext_s, laplace_perp_u)
     convolve_with_kernel_y_dir(laplace_perp_u, k_ext_s, radius_ext_s, storage)

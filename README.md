@@ -44,7 +44,7 @@ The main functionality is exposed as top level functions:
 ## Cite
 If you use this code in your own work, please cite our paper:
 
-<a id="1">[1]</a> Sherry, F.M., Schaefer, K., Duits, R. "Diffusion-Shock Filtering on the Space of Positions and Orientations." 10th International Conference on Scale Space and Variational Methods in Computer Vision (SSVM) (2025).
+<a id="1">[1]</a> Sherry, F.M., Schaefer, K., Duits, R. "Diffusion-Shock Filtering on the Space of Positions and Orientations." 10th International Conference on Scale Space and Variational Methods in Computer Vision (SSVM) (2025). https://doi.org/10.1007/978-3-031-92369-2_16
 ```
 @inproceedings{Sherry2025DSM2,
   author =       {Sherry, Finn M. and Schaefer, Kristina and Duits, Remco},
@@ -53,8 +53,8 @@ If you use this code in your own work, please cite our paper:
   publisher =    {Springer},
   year =         {2025},
   address =      {Totnes, United Kingdom},
-  pages =        {},
-  doi =          {},
+  pages =        {205--217},
+  doi =          {10.1007/978-3-031-92369-2_16},
   editor =       {Bubba, Tatiana and Papafitsoros, Kostas and Gazzola, Silvia and Pereyra, Marcelo and Gaburro, Romina and Schönlieb, Carola}
 }
 ```

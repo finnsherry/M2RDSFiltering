@@ -1,39 +1,40 @@
 """
-    filter
-    ======
+filter
+======
 
-    Provides methods to apply left-invariant M_2 Diffusion-Shock filtering,[1]
-    inspired by the Diffusion-Shock filtering on R^2 by K. Schaefer and
-    J. Weickert.[2][3]
-    The primary methods are:
-      1. `DS_enhancing_LI`: perform left-invariant RDS filtering on M_2 for
-      denoising.
-      2. `DS_inpainting_LI`: perform left-invariant RDS inpainting on M_2.
-      3. `TV_enhancing_LI`: perform left-invariant TR-TV flow on M_2 for
-      denoising.[4][5]
+Provides methods to apply left-invariant M_2 Diffusion-Shock filtering,[1]
+inspired by the Diffusion-Shock filtering on R^2 by K. Schaefer and
+J. Weickert.[2][3]
+The primary methods are:
+  1. `DS_enhancing_LI`: perform left-invariant RDS filtering on M_2 for
+  denoising.
+  2. `DS_inpainting_LI`: perform left-invariant RDS inpainting on M_2.
+  3. `TV_enhancing_LI`: perform left-invariant TR-TV flow on M_2 for
+  denoising.[4][5]
 
-    References:
-      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
-      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
-      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
-      DOI:.
-      [2]: K. Schaefer and J. Weickert.
-      "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
-      Computer Vision 14009 (2023), pp. 588--600.
-      DOI:10.1007/978-3-031-31975-4_45.
-      [3]: K. Schaefer and J. Weickert.
-      "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
-      Imaging and Vision (2024).
-      DOI:10.1007/s10851-024-01175-0.
-      [4]: A. Chambolle and Th. Pock.
-      "Total roto-translational variation." In: Numerische Mathematik (2019),
-      pp. 611--666.
-      DOI:10.1137/s00211-019-01026-w.
-      [5]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
-      "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
-      Positions and Orientations." In: Journal of Mathematical Imaging and
-      Vision (2021).
-      DOI:10.1007/s10851-020-00991-4.
+References:
+  [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+  "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+  In: Scale Space and Variational Methods in Computer Vision (2025),
+  pp. 205--217.
+  DOI:10.1007/978-3-031-92369-2_16.
+  [2]: K. Schaefer and J. Weickert.
+  "Diffusion-Shock Inpainting." In: Scale Space and Variational Methods in
+  Computer Vision 14009 (2023), pp. 588--600.
+  DOI:10.1007/978-3-031-31975-4_45.
+  [3]: K. Schaefer and J. Weickert.
+  "Regularised Diffusion-Shock Inpainting." In: Journal of Mathematical
+  Imaging and Vision (2024).
+  DOI:10.1007/s10851-024-01175-0.
+  [4]: A. Chambolle and Th. Pock.
+  "Total roto-translational variation." In: Numerische Mathematik (2019),
+  pp. 611--666.
+  DOI:10.1137/s00211-019-01026-w.
+  [5]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+  "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+  Positions and Orientations." In: Journal of Mathematical Imaging and
+  Vision (2021).
+  DOI:10.1007/s10851-020-00991-4.
 """
 
 import taichi as ti
@@ -43,24 +44,35 @@ from dsfilter.M2.LI.switches import (
     DS_switch,
     DS_switch_s,
     morphological_switch,
-    morphological_switch_s
+    morphological_switch_s,
 )
 from dsfilter.M2.LI.derivatives import (
     laplacian,
     laplacian_s,
     morphological,
     morphological_s,
-    TV
+    TV,
 )
 from dsfilter.M2.regularisers import gaussian_kernel
 from dsfilter.M2.utils import project_down
-from dsfilter.utils import (
-    compute_PSNR,
-    compute_L2,
-    compute_L1
-)
+from dsfilter.utils import compute_PSNR, compute_L2, compute_L1
 
-def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, σ, ρ, ν, λ, ε=0., dxy=1.):
+
+def DS_enhancing(
+    u0_np,
+    ground_truth_np,
+    θs_np,
+    ξ,
+    T,
+    G_D_inv_np,
+    G_S_inv_np,
+    σ,
+    ρ,
+    ν,
+    λ,
+    ε=0.0,
+    dxy=1.0,
+):
     """
     Perform left-invariant Diffusion-Shock filtering in M_2 for denoising.[1]
 
@@ -89,7 +101,7 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, 
           values greater than 0.
         `λ`: contrast parameter used to determine whether to perform diffusion
           or shock based on the degree of local orientation.
-        
+
       Optional:
         `ε`: regularisation parameter for the signum function used to switch
           between dilation and erosion.
@@ -103,8 +115,8 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, 
         [1]: F.M. Sherry, K. Schaefer, and R. Duits.
           "Diffusion-Shock Filtering on the Space of Positions and
           Orientations." In: Scale Space and Variational Methods in Computer
-          Vision (2025), pp. .
-          DOI:.
+          Vision (2025), pp. 205--217.
+          DOI:10.1007/978-3-031-92369-2_16.
     """
     # Set hyperparameters
     shape = u0_np.shape
@@ -150,36 +162,93 @@ def DS_enhancing(u0_np, ground_truth_np, θs_np, ξ, T, G_D_inv_np, G_S_inv_np, 
     switch_morph = ti.field(dtype=ti.f32, shape=shape)
 
     ## Image Quality Measures
-    max_val = 255. # Images are assumed to take gray values in [0, 255].
+    max_val = 255.0  # Images are assumed to take gray values in [0, 255].
     ground_truth = ti.field(dtype=ti.f32, shape=shape[:-1])
     ground_truth.from_numpy(ground_truth_np)
     u_projected = ti.field(dtype=ti.f32, shape=shape[:-1])
-    project_down(u, u_projected, 0., max_val, 1.)
+    project_down(u, u_projected, 0.0, max_val, 1.0)
     PSNR = [compute_PSNR(u_projected, ground_truth, max_val)]
     L1 = [compute_L1(u_projected, ground_truth)]
     L2 = [compute_L2(u_projected, ground_truth)]
 
     for _ in tqdm(range(n)):
         # Compute switches
-        DS_switch(u_switch, dxy, dθ, ξ, θs, k_s_DS, radius_s_DS, k_o_DS, radius_o_DS, λ, gradient_u, switch_DS, storage)
-        morphological_switch(u_switch, dxy, dθ, ξ, θs, ε, k_s_morph_int, radius_s_morph_int, k_o_morph_int,
-                             radius_o_morph_int, k_s_morph_ext, radius_s_morph_ext, k_o_morph_ext, radius_o_morph_ext,
-                             laplace_perp_u, switch_morph, storage)
+        DS_switch(
+            u_switch,
+            dxy,
+            dθ,
+            ξ,
+            θs,
+            k_s_DS,
+            radius_s_DS,
+            k_o_DS,
+            radius_o_DS,
+            λ,
+            gradient_u,
+            switch_DS,
+            storage,
+        )
+        morphological_switch(
+            u_switch,
+            dxy,
+            dθ,
+            ξ,
+            θs,
+            ε,
+            k_s_morph_int,
+            radius_s_morph_int,
+            k_o_morph_int,
+            radius_o_morph_int,
+            k_s_morph_ext,
+            radius_s_morph_ext,
+            k_o_morph_ext,
+            radius_o_morph_ext,
+            laplace_perp_u,
+            switch_morph,
+            storage,
+        )
         # Compute derivatives
         laplacian(u, G_D_inv, dxy, dθ, θs, laplacian_u)
         morphological(u, G_S_inv, dxy, dθ, θs, dilation_u, erosion_u)
         # Step
-        step_DS(u, mask, dt, switch_DS, switch_morph, laplacian_u, dilation_u, erosion_u, du_dt)
+        step_DS(
+            u,
+            mask,
+            dt,
+            switch_DS,
+            switch_morph,
+            laplacian_u,
+            dilation_u,
+            erosion_u,
+            du_dt,
+        )
         # Update fields for switches
         fill_u_switch(u, u_switch)
 
-        project_down(u, u_projected, 0., max_val, 1.)
+        project_down(u, u_projected, 0.0, max_val, 1.0)
         PSNR.append(compute_PSNR(u_projected, ground_truth, max_val))
         L2.append(compute_L2(u_projected, ground_truth))
         L1.append(compute_L1(u_projected, ground_truth))
     return u.to_numpy(), np.array(PSNR), np.array(L2), np.array(L1)
 
-def DS_inpainting(u0_np, mask_np, θs_np, T, G_D_inv_np, G_S_inv_np, σ_s, σ_o, ρ_s, ρ_o, ν_s, ν_o, λ, ε=0., dxy=1.):
+
+def DS_inpainting(
+    u0_np,
+    mask_np,
+    θs_np,
+    T,
+    G_D_inv_np,
+    G_S_inv_np,
+    σ_s,
+    σ_o,
+    ρ_s,
+    ρ_o,
+    ν_s,
+    ν_o,
+    λ,
+    ε=0.0,
+    dxy=1.0,
+):
     """
     Perform left-invariant Diffusion-Shock inpainting in M_2.[1]
 
@@ -215,7 +284,7 @@ def DS_inpainting(u0_np, mask_np, θs_np, T, G_D_inv_np, G_S_inv_np, σ_s, σ_o,
           greater than 0.
         `λ`: contrast parameter used to determine whether to perform diffusion
           or shock based on the degree of local orientation.
-        
+
       Optional:
         `ε`: regularisation parameter for the signum function used to switch
           between dilation and erosion.
@@ -229,8 +298,8 @@ def DS_inpainting(u0_np, mask_np, θs_np, T, G_D_inv_np, G_S_inv_np, σ_s, σ_o,
         [1]: F.M. Sherry, K. Schaefer, and R. Duits.
           "Diffusion-Shock Filtering on the Space of Positions and
           Orientations." In: Scale Space and Variational Methods in Computer
-          Vision (2025), pp. .
-          DOI:.
+          Vision (2025), pp. 205--217.
+          DOI:10.1007/978-3-031-92369-2_16.
     """
     # Set hyperparameters
     shape = u0_np.shape
@@ -277,18 +346,55 @@ def DS_inpainting(u0_np, mask_np, θs_np, T, G_D_inv_np, G_S_inv_np, σ_s, σ_o,
 
     for _ in tqdm(range(n)):
         # Compute switches
-        DS_switch_s(u_switch, dxy, θs, k_s_DS, radius_s_DS, k_o_DS, radius_o_DS, λ, gradient_u, switch_DS, storage)
-        morphological_switch_s(u_switch, dxy, θs, ε, k_s_morph_int, radius_s_morph_int, k_o_morph_int,
-                               radius_o_morph_int, k_s_morph_ext, radius_s_morph_ext, k_o_morph_ext, radius_o_morph_ext,
-                               laplace_perp_u, switch_morph, storage)
+        DS_switch_s(
+            u_switch,
+            dxy,
+            θs,
+            k_s_DS,
+            radius_s_DS,
+            k_o_DS,
+            radius_o_DS,
+            λ,
+            gradient_u,
+            switch_DS,
+            storage,
+        )
+        morphological_switch_s(
+            u_switch,
+            dxy,
+            θs,
+            ε,
+            k_s_morph_int,
+            radius_s_morph_int,
+            k_o_morph_int,
+            radius_o_morph_int,
+            k_s_morph_ext,
+            radius_s_morph_ext,
+            k_o_morph_ext,
+            radius_o_morph_ext,
+            laplace_perp_u,
+            switch_morph,
+            storage,
+        )
         # Compute derivatives
         laplacian_s(u, G_D_inv, dxy, θs, laplacian_u)
         morphological_s(u, G_S_inv, dxy, θs, dilation_u, erosion_u)
         # Step
-        step_DS(u, mask, dt, switch_DS, switch_morph, laplacian_u, dilation_u, erosion_u, du_dt)
+        step_DS(
+            u,
+            mask,
+            dt,
+            switch_DS,
+            switch_morph,
+            laplacian_u,
+            dilation_u,
+            erosion_u,
+            du_dt,
+        )
         # Update fields for switches
         fill_u_switch(u, u_switch)
     return u.to_numpy()
+
 
 @ti.kernel
 def step_DS(
@@ -300,7 +406,7 @@ def step_DS(
     laplacian_u: ti.template(),
     dilation_u: ti.template(),
     erosion_u: ti.template(),
-    du_dt: ti.template()
+    du_dt: ti.template(),
 ):
     """
     @taichi.kernel
@@ -333,26 +439,25 @@ def step_DS(
         [1]: F.M. Sherry, K. Schaefer, and R. Duits.
           "Diffusion-Shock Filtering on the Space of Positions and
           Orientations." In: Scale Space and Variational Methods in Computer
-          Vision (2025), pp. .
-          DOI:.
+          Vision (2025), pp. 205--217.
+          DOI:10.1007/978-3-031-92369-2_16.
     """
     for I in ti.grouped(du_dt):
-        du_dt[I] = (
-            laplacian_u[I] * switch_DS[I] +
-            (1 - switch_DS[I]) * (
-                # Do erosion when switch_morph = 1.
-                erosion_u[I] * (switch_morph[I] > 0.) * ti.abs(switch_morph[I])  +
-                # Do dilation when switch_morph = -1.
-                dilation_u[I] * (switch_morph[I] < 0.) * ti.abs(switch_morph[I])
-            )
+        du_dt[I] = laplacian_u[I] * switch_DS[I] + (1 - switch_DS[I]) * (
+            # Do erosion when switch_morph = 1.
+            erosion_u[I] * (switch_morph[I] > 0.0) * ti.abs(switch_morph[I])
+            +
+            # Do dilation when switch_morph = -1.
+            dilation_u[I] * (switch_morph[I] < 0.0) * ti.abs(switch_morph[I])
         )
-        u[I] += dt * du_dt[I] * (1 - mask[I]) # Only change values in the mask.
+        u[I] += dt * du_dt[I] * (1 - mask[I])  # Only change values in the mask.
+
 
 def compute_timestep(dxy, dθ, G_D_inv, G_S_inv):
     """
     Compute timestep to solve Diffusion-Shock PDE,[1] such that the scheme
     retains the maximum-minimum principle of the continuous PDE.
-    
+
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
         `dθ`: step size in θ direction, taking values greater than 0.
@@ -362,7 +467,7 @@ def compute_timestep(dxy, dθ, G_D_inv, G_S_inv):
         `G_S_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
           basis used to define the shock.
-    
+
     Returns:
         timestep, taking values greater than 0.
 
@@ -370,42 +475,44 @@ def compute_timestep(dxy, dθ, G_D_inv, G_S_inv):
         [1]: F.M. Sherry, K. Schaefer, and R. Duits.
           "Diffusion-Shock Filtering on the Space of Positions and
           Orientations." In: Scale Space and Variational Methods in Computer
-          Vision (2025), pp. .
-          DOI:.
+          Vision (2025), pp. 205--217.
+          DOI:10.1007/978-3-031-92369-2_16.
     """
     τ_D = compute_timestep_diffusion(dxy, dθ, G_D_inv)
     τ_M = compute_timestep_shock(dxy, dθ, G_S_inv)
     return min(τ_D, τ_M)
 
+
 def compute_timestep_diffusion(dxy, dθ, G_D_inv):
     """
     Compute timestep to solve Diffusion PDE, such that the scheme retains the
     maximum-minimum principle of the continuous PDE.
-    
+
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
         `dθ`: step size in θ direction, taking values greater than 0.
         `G_D_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
           basis used to define the diffusion.
-    
+
     Returns:
         timestep, taking values greater than 0.
     """
     return 1 / (4 * ((G_D_inv[0] + G_D_inv[1]) / dxy**2 + G_D_inv[2] / dθ**2))
 
+
 def compute_timestep_shock(dxy, dθ, G_S_inv):
     """
     Compute timestep to solve (Coherence-Enhancing) Shock PDE, such that the
     scheme retains the maximum-minimum principle of the continuous PDE.
-    
+
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
         `dθ`: step size in θ direction, taking values greater than 0.
         `G_S_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
           basis used to define the shock.
-    
+
     Returns:
         timestep, taking values greater than 0.
     """
@@ -414,7 +521,20 @@ def compute_timestep_shock(dxy, dθ, G_S_inv):
 
 # TR-TV Flow
 
-def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, dxy, dθ, θs_np, σ_s, σ_o, T, dt=None, λ=1.):
+
+def TV_enhancing(
+    u0_np_unscaled,
+    ground_truth_np,
+    G_inv_np,
+    dxy,
+    dθ,
+    θs_np,
+    σ_s,
+    σ_o,
+    T,
+    dt=None,
+    λ=1.0,
+):
     """
     Perform left-invariant Total Roto-Translational Variation (TR-TV) Flow in
     M_2.[1][2]
@@ -475,27 +595,46 @@ def TV_enhancing(u0_np_unscaled, ground_truth_np, G_inv_np, dxy, dθ, θs_np, σ
     storage = ti.field(dtype=ti.f32, shape=shape)
 
     ## Image Quality Measures
-    max_val = 255. # Images are assumed to take gray values in [0, 255].
+    max_val = 255.0  # Images are assumed to take gray values in [0, 255].
     ground_truth = ti.field(dtype=ti.f32, shape=shape[:-1])
     ground_truth.from_numpy(ground_truth_np)
     print(ground_truth.shape)
     u_projected = ti.field(dtype=ti.f32, shape=shape[:-1])
-    project_down(u, u_projected, 0., max_val, λ)
+    project_down(u, u_projected, 0.0, max_val, λ)
     PSNR = [compute_PSNR(u_projected, ground_truth, max_val)]
     L2 = [compute_L2(u_projected, ground_truth)]
     L1 = [compute_L1(u_projected, ground_truth)]
 
     for _ in tqdm(range(n)):
-        TV(u, G_inv, dxy, dθ, θs, k_s, radius_s, k_o, radius_o, A1_u, A2_u, A3_u, grad_norm_u, normalised_grad_1,
-           normalised_grad_2, normalised_grad_3, TV_u, storage)
+        TV(
+            u,
+            G_inv,
+            dxy,
+            dθ,
+            θs,
+            k_s,
+            radius_s,
+            k_o,
+            radius_o,
+            A1_u,
+            A2_u,
+            A3_u,
+            grad_norm_u,
+            normalised_grad_1,
+            normalised_grad_2,
+            normalised_grad_3,
+            TV_u,
+            storage,
+        )
         step_TV(u, dt, TV_u)
 
-        project_down(u, u_projected, 0., max_val, λ)
+        project_down(u, u_projected, 0.0, max_val, λ)
         PSNR.append(compute_PSNR(u_projected, ground_truth, max_val))
         L2.append(compute_L2(u_projected, ground_truth))
         L1.append(compute_L1(u_projected, ground_truth))
     return u.to_numpy() / λ, np.array(PSNR), np.array(L2), np.array(L1)
-    
+
+
 @ti.kernel
 def step_TV(
     u: ti.template(),
@@ -510,7 +649,7 @@ def step_TV(
     Args:
       Static:
         `dt`: step size, taking values greater than 0.
-        `TV_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) of 
+        `TV_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) of
           div(grad `u` / ||grad `u`||), which is updated in place.
       Mutated:
         `u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) which we want to evolve
@@ -519,29 +658,29 @@ def step_TV(
     for I in ti.grouped(TV_u):
         u[I] += dt * TV_u[I]
 
+
 def compute_timestep_TV(dxy, dθ, G_inv):
     """
     Compute timestep to solve TR-TV flow.
-    
+
     Args:
         `dxy`: step size in x and y direction, taking values greater than 0.
         `dθ`: step size in θ direction, taking values greater than 0.
         `G_inv_np`: np.ndarray(shape=(3,), dtype=[float]) of constants of the
           inverse of the diagonal metric tensor with respect to left invariant
           basis used to define the TR-TV flow.
-    
+
     Returns:
         timestep, taking values greater than 0.
     """
     return dxy**2 * dθ / (2 * ((G_inv[0] + G_inv[1]) * dxy + G_inv[2] * dθ))
 
+
 # Fix padding function
 
+
 @ti.kernel
-def fill_u_switch(
-    u: ti.template(),
-    u_switch: ti.template()
-):
+def fill_u_switch(u: ti.template(), u_switch: ti.template()):
     """
     @taichi.kernel
 

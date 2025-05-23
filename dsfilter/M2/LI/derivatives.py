@@ -1,29 +1,30 @@
 """
-    derivatives
-    ===========
+derivatives
+===========
 
-    Provides a variety of derivative operators on M_2, namely:
-      1. `laplacian`: computes an approximation of the 0 Lie-Cartan Laplacian
-      given some left-invariant metric tensor field, see Eq. (9) in [1].
-      2. `morphological`: computes approximations of the dilation and erosion
-      operators +/- ||grad u||, see Eq. (10) in [1].
-      3. `TV`: computes an approximation of the total roto-translational
-      generator div(grad u/||grad u||).
+Provides a variety of derivative operators on M_2, namely:
+  1. `laplacian`: computes an approximation of the 0 Lie-Cartan Laplacian
+  given some left-invariant metric tensor field, see Eq. (9) in [1].
+  2. `morphological`: computes approximations of the dilation and erosion
+  operators +/- ||grad u||, see Eq. (10) in [1].
+  3. `TV`: computes an approximation of the total roto-translational
+  generator div(grad u/||grad u||).
 
-    References:
-      [1]: F.M. Sherry, K. Schaefer, and R. Duits.
-      "Diffusion-Shock Filtering on the Space of Positions and Orientations."
-      In: Scale Space and Variational Methods in Computer Vision (2025), pp. .
-      DOI:.
-      [2]: A. Chambolle and Th. Pock.
-      "Total roto-translational variation." In: Numerische Mathematik (2019),
-      pp. 611--666.
-      DOI:10.1007/s00211-019-01026-w.
-      [3]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
-      "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
-      Positions and Orientations." In: Journal of Mathematical Imaging and
-      Vision (2021), pp. 237-262.
-      DOI:10.1007/s10851-020-00991-4.
+References:
+  [1]: F.M. Sherry, K. Schaefer, and R. Duits.
+  "Diffusion-Shock Filtering on the Space of Positions and Orientations."
+  In: Scale Space and Variational Methods in Computer Vision (2025),
+  pp. 205--217.
+  DOI:10.1007/978-3-031-92369-2_16.
+  [2]: A. Chambolle and Th. Pock.
+  "Total roto-translational variation." In: Numerische Mathematik (2019),
+  pp. 611--666.
+  DOI:10.1007/s00211-019-01026-w.
+  [3]: B.M.N. Smets, J.W. Portegies, E. St-Onge, and R. Duits.
+  "Total Variation and Mean Curvature PDEs on the Homogeneous Space of
+  Positions and Orientations." In: Journal of Mathematical Imaging and
+  Vision (2021), pp. 237-262.
+  DOI:10.1007/s10851-020-00991-4.
 """
 
 import taichi as ti
@@ -31,13 +32,15 @@ from dsfilter.M2.utils import scalar_trilinear_interpolate
 from dsfilter.M2.regularisers import (
     convolve_with_kernel_x_dir,
     convolve_with_kernel_y_dir,
-    convolve_with_kernel_θ_dir
+    convolve_with_kernel_θ_dir,
 )
 from dsfilter.utils import (
     select_upwind_derivative_dilation,
-    select_upwind_derivative_erosion
+    select_upwind_derivative_erosion,
 )
+
 # Actual Derivatives
+
 
 @ti.kernel
 def laplacian(
@@ -46,7 +49,7 @@ def laplacian(
     dxy: ti.f32,
     dθ: ti.f32,
     θs: ti.template(),
-    laplacian_u: ti.template()
+    laplacian_u: ti.template(),
 ):
     """
     @taichi.kernel
@@ -68,7 +71,7 @@ def laplacian(
         `laplacian_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) laplacian of
           u, which is updated in place.
     """
-    I_A3 = ti.Vector([0.0,  0.0, 1.0], dt=ti.f32)
+    I_A3 = ti.Vector([0.0, 0.0, 1.0], dt=ti.f32)
     for I in ti.grouped(laplacian_u):
         θ = θs[I]
         cos = ti.math.cos(θ)
@@ -76,17 +79,24 @@ def laplacian(
         I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32)
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
 
-        A11 = (scalar_trilinear_interpolate(u, I + I_A1) -
-               2 * u[I] +
-               scalar_trilinear_interpolate(u, I - I_A1)) / dxy**2
-        A22 = (scalar_trilinear_interpolate(u, I + I_A2) -
-               2 * u[I] +
-               scalar_trilinear_interpolate(u, I - I_A2)) / dxy**2
-        A33 = (scalar_trilinear_interpolate(u, I + I_A3) -
-               2 * u[I] +
-               scalar_trilinear_interpolate(u, I - I_A3)) / dθ**2
+        A11 = (
+            scalar_trilinear_interpolate(u, I + I_A1)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A1)
+        ) / dxy**2
+        A22 = (
+            scalar_trilinear_interpolate(u, I + I_A2)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A2)
+        ) / dxy**2
+        A33 = (
+            scalar_trilinear_interpolate(u, I + I_A3)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A3)
+        ) / dθ**2
         # Δu = div(grad(u)) = sqrt(det(g)) A_i (sqrt(det(g)) g^ij A_j u) = g^ij A_i A_j u = g^ii A_i A_i u
         laplacian_u[I] = G_inv[0] * A11 + G_inv[1] * A22 + G_inv[2] * A33
+
 
 @ti.kernel
 def laplacian_s(
@@ -94,7 +104,7 @@ def laplacian_s(
     G_inv: ti.types.vector(2, ti.f32),
     dxy: ti.f32,
     θs: ti.template(),
-    laplacian_u: ti.template()
+    laplacian_u: ti.template(),
 ):
     """
     @taichi.kernel
@@ -121,14 +131,19 @@ def laplacian_s(
         I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32)
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
 
-        A11 = (scalar_trilinear_interpolate(u, I + I_A1) -
-               2 * u[I] +
-               scalar_trilinear_interpolate(u, I - I_A1)) / dxy**2
-        A22 = (scalar_trilinear_interpolate(u, I + I_A2) -
-               2 * u[I] +
-               scalar_trilinear_interpolate(u, I - I_A2)) / dxy**2
+        A11 = (
+            scalar_trilinear_interpolate(u, I + I_A1)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A1)
+        ) / dxy**2
+        A22 = (
+            scalar_trilinear_interpolate(u, I + I_A2)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A2)
+        ) / dxy**2
         # Δu = div(grad(u)) = sqrt(det(g)) A_i (sqrt(det(g)) g^ij A_j u) = g^ij A_i A_j u = g^ii A_i A_i u
         laplacian_u[I] = G_inv[0] * A11 + G_inv[1] * A22
+
 
 @ti.kernel
 def morphological(
@@ -138,7 +153,7 @@ def morphological(
     dθ: ti.f32,
     θs: ti.template(),
     dilation_u: ti.template(),
-    erosion_u: ti.template()
+    erosion_u: ti.template(),
 ):
     """
     @taichi.kernel
@@ -148,7 +163,7 @@ def morphological(
 
     Args:
       Static:
-        `u`: ti.field(dtype=[float], shape=[Nx+2, Ny+2, Nθ]) which we want to 
+        `u`: ti.field(dtype=[float], shape=[Nx+2, Ny+2, Nθ]) which we want to
           differentiate.
         `G_inv`: ti.types.vector(n=3, dtype=[float]) constants of the inverse of
           the diagonal metric tensor with respect to left invariant basis.
@@ -162,7 +177,7 @@ def morphological(
         `erosion_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ]) -||grad `u`||,
           which is updated in place.
     """
-    I_A3 = ti.Vector([0.0,  0.0, 1.0], dt=ti.f32)
+    I_A3 = ti.Vector([0.0, 0.0, 1.0], dt=ti.f32)
     for I in ti.grouped(dilation_u):
         θ = θs[I]
         cos = ti.math.cos(θ)
@@ -180,16 +195,17 @@ def morphological(
         # ||grad u|| = sqrt(G(grad u, grad u)) = sqrt(g^ij A_i u A_j u) = sqrt(g^ii (A_i u)^2)
         # Dilation
         dilation_u[I] = ti.math.sqrt(
-            G_inv[0] * select_upwind_derivative_dilation(A1_forward, A1_backward)**2 +
-            G_inv[1] * select_upwind_derivative_dilation(A2_forward, A2_backward)**2 +
-            G_inv[2] * select_upwind_derivative_dilation(A3_forward, A3_backward)**2
+            G_inv[0] * select_upwind_derivative_dilation(A1_forward, A1_backward) ** 2
+            + G_inv[1] * select_upwind_derivative_dilation(A2_forward, A2_backward) ** 2
+            + G_inv[2] * select_upwind_derivative_dilation(A3_forward, A3_backward) ** 2
         )
         # Erosion
         erosion_u[I] = -ti.math.sqrt(
-            G_inv[0] * select_upwind_derivative_erosion(A1_forward, A1_backward)**2 +
-            G_inv[1] * select_upwind_derivative_erosion(A2_forward, A2_backward)**2 +
-            G_inv[2] * select_upwind_derivative_erosion(A3_forward, A3_backward)**2
+            G_inv[0] * select_upwind_derivative_erosion(A1_forward, A1_backward) ** 2
+            + G_inv[1] * select_upwind_derivative_erosion(A2_forward, A2_backward) ** 2
+            + G_inv[2] * select_upwind_derivative_erosion(A3_forward, A3_backward) ** 2
         )
+
 
 @ti.kernel
 def morphological_s(
@@ -198,7 +214,7 @@ def morphological_s(
     dxy: ti.f32,
     θs: ti.template(),
     dilation_u: ti.template(),
-    erosion_u: ti.template()
+    erosion_u: ti.template(),
 ):
     """
     @taichi.kernel
@@ -208,7 +224,7 @@ def morphological_s(
 
     Args:
       Static:
-        `u`: ti.field(dtype=[float], shape=[Nx+2, Ny+2, Nθ]) which we want to 
+        `u`: ti.field(dtype=[float], shape=[Nx+2, Ny+2, Nθ]) which we want to
           differentiate.
         `G_inv`: ti.types.vector(n=2, dtype=[float]) spatial constants of the
           inverse of the diagonal metric tensor with respect to left invariant
@@ -236,14 +252,15 @@ def morphological_s(
         # ||grad u|| = sqrt(G(grad u, grad u)) = sqrt(g^ij A_i u A_j u) = sqrt(g^ii (A_i u)^2)
         # Dilation
         dilation_u[I] = ti.math.sqrt(
-            G_inv[0] * select_upwind_derivative_dilation(A1_forward, A1_backward)**2 +
-            G_inv[1] * select_upwind_derivative_dilation(A2_forward, A2_backward)**2
+            G_inv[0] * select_upwind_derivative_dilation(A1_forward, A1_backward) ** 2
+            + G_inv[1] * select_upwind_derivative_dilation(A2_forward, A2_backward) ** 2
         )
         # Erosion
         erosion_u[I] = -ti.math.sqrt(
-            G_inv[0] * select_upwind_derivative_erosion(A1_forward, A1_backward)**2 +
-            G_inv[1] * select_upwind_derivative_erosion(A2_forward, A2_backward)**2
+            G_inv[0] * select_upwind_derivative_erosion(A1_forward, A1_backward) ** 2
+            + G_inv[1] * select_upwind_derivative_erosion(A2_forward, A2_backward) ** 2
         )
+
 
 @ti.func
 def gradient(
@@ -252,7 +269,7 @@ def gradient(
     dθ: ti.f32,
     θs: ti.template(),
     ξ: ti.f32,
-    gradient_u: ti.template()
+    gradient_u: ti.template(),
 ):
     """
     @taichi.func
@@ -282,21 +299,37 @@ def gradient(
         I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32) / 2
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32) / 2
         # ||grad u|| = sqrt(G(grad u, grad u)) = sqrt(g^ij A_i u A_j u) = sqrt(ξ^-2 ((A_1 u)^2 + (A_2 u)^2) + (A_3 u)^2)
-        gradient_u[I] = ti.math.sqrt(((
-                scalar_trilinear_interpolate(u, I + I_A1) - scalar_trilinear_interpolate(u, I - I_A1)
-            ) / (ξ * dxy))**2 + ((
-                scalar_trilinear_interpolate(u, I + I_A2) - scalar_trilinear_interpolate(u, I - I_A2)
-            ) / (ξ * dxy))**2 + ((
-                scalar_trilinear_interpolate(u, I + I_A3) - scalar_trilinear_interpolate(u, I - I_A3)
-            ) / dθ)**2
+        gradient_u[I] = ti.math.sqrt(
+            (
+                (
+                    scalar_trilinear_interpolate(u, I + I_A1)
+                    - scalar_trilinear_interpolate(u, I - I_A1)
+                )
+                / (ξ * dxy)
+            )
+            ** 2
+            + (
+                (
+                    scalar_trilinear_interpolate(u, I + I_A2)
+                    - scalar_trilinear_interpolate(u, I - I_A2)
+                )
+                / (ξ * dxy)
+            )
+            ** 2
+            + (
+                (
+                    scalar_trilinear_interpolate(u, I + I_A3)
+                    - scalar_trilinear_interpolate(u, I - I_A3)
+                )
+                / dθ
+            )
+            ** 2
         )
+
 
 @ti.func
 def gradient_s(
-    u: ti.template(),
-    dxy: ti.f32,
-    θs: ti.template(),
-    gradient_u: ti.template()
+    u: ti.template(), dxy: ti.f32, θs: ti.template(), gradient_u: ti.template()
 ):
     """
     @taichi.func
@@ -321,12 +354,25 @@ def gradient_s(
         I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32) / 2
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32) / 2
         # ||grad u|| = sqrt(G(grad u, grad u)) = sqrt(g^ij A_i u A_j u) = sqrt(g^11 (A_1 u)^2 + g^22 (A_2 u)^2)
-        gradient_u[I] = ti.math.sqrt(((
-                scalar_trilinear_interpolate(u, I + I_A1) - scalar_trilinear_interpolate(u, I - I_A1)
-            ) / dxy)**2 + ((
-                scalar_trilinear_interpolate(u, I + I_A2) - scalar_trilinear_interpolate(u, I - I_A2)
-            ) / dxy)**2
+        gradient_u[I] = ti.math.sqrt(
+            (
+                (
+                    scalar_trilinear_interpolate(u, I + I_A1)
+                    - scalar_trilinear_interpolate(u, I - I_A1)
+                )
+                / dxy
+            )
+            ** 2
+            + (
+                (
+                    scalar_trilinear_interpolate(u, I + I_A2)
+                    - scalar_trilinear_interpolate(u, I - I_A2)
+                )
+                / dxy
+            )
+            ** 2
         )
+
 
 @ti.func
 def laplace_perp(
@@ -335,7 +381,7 @@ def laplace_perp(
     dθ: ti.f32,
     θs: ti.template(),
     ξ: ti.f32,
-    laplace_perp_u: ti.template()
+    laplace_perp_u: ti.template(),
 ):
     """
     @taichi.func
@@ -358,26 +404,27 @@ def laplace_perp(
         `laplace_perp_u`: ti.field(dtype=[float], shape=[Nx, Ny, Nθ])
           perpendicular laplacian of u, which is updated in place.
     """
-    I_A3 = ti.Vector([0.0,  0.0, 1.0], dt=ti.f32)
+    I_A3 = ti.Vector([0.0, 0.0, 1.0], dt=ti.f32)
     for I in ti.grouped(laplace_perp_u):
         θ = θs[I]
         cos = ti.math.cos(θ)
         sin = ti.math.sin(θ)
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
         # Δ_perp u = div_perp(grad_perp(u)) = sqrt(det(g)) A_i (sqrt(det(g)) g^ij A_j u) = g^ij A_i A_j u = A_2 A_2 u + ξ^2 A_3 A_3 u
-        laplace_perp_u[I] = ((
-                scalar_trilinear_interpolate(u, I + I_A2) - 2 * u[I] + scalar_trilinear_interpolate(u, I - I_A2)
-            ) / (ξ * dxy)**2 + (
-                scalar_trilinear_interpolate(u, I + I_A3) - 2 * u[I] + scalar_trilinear_interpolate(u, I - I_A3)
-            ) / dθ**2
-        )
+        laplace_perp_u[I] = (
+            scalar_trilinear_interpolate(u, I + I_A2)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A2)
+        ) / (ξ * dxy) ** 2 + (
+            scalar_trilinear_interpolate(u, I + I_A3)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A3)
+        ) / dθ**2
+
 
 @ti.func
 def laplace_perp_s(
-    u: ti.template(),
-    dxy: ti.f32,
-    θs: ti.template(),
-    laplace_perp_u: ti.template()
+    u: ti.template(), dxy: ti.f32, θs: ti.template(), laplace_perp_u: ti.template()
 ):
     """
     @taichi.func
@@ -401,10 +448,12 @@ def laplace_perp_s(
         sin = ti.math.sin(θ)
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32)
         # Δ_perp u = div_perp(grad_perp(u)) = sqrt(det(g)) A_i (sqrt(det(g)) g^ij A_j u) = g^ij A_i A_j u = A_2 A_2 u
-        laplace_perp_u[I] = ((
-                scalar_trilinear_interpolate(u, I + I_A2) - 2 * u[I] + scalar_trilinear_interpolate(u, I - I_A2)
-            ) / dxy**2
-        )
+        laplace_perp_u[I] = (
+            scalar_trilinear_interpolate(u, I + I_A2)
+            - 2 * u[I]
+            + scalar_trilinear_interpolate(u, I - I_A2)
+        ) / dxy**2
+
 
 @ti.kernel
 def TV(
@@ -425,7 +474,7 @@ def TV(
     normalised_grad_2: ti.template(),
     normalised_grad_3: ti.template(),
     TV_u: ti.template(),
-    storage: ti.template()
+    storage: ti.template(),
 ):
     """
     @taichi.kernel
@@ -454,7 +503,7 @@ def TV(
           Vision (2021), pp. 237-262.
           DOI:10.1007/s10851-020-00991-4.
     """
-    I_A3 = ti.Vector([0.0,  0.0, 1.0], dt=ti.f32) / 2
+    I_A3 = ti.Vector([0.0, 0.0, 1.0], dt=ti.f32) / 2
     for I in ti.grouped(A1_u):
         θ = θs[I]
         cos = ti.math.cos(θ)
@@ -462,16 +511,24 @@ def TV(
         I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32) / 2
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32) / 2
 
-        c1 = (scalar_trilinear_interpolate(u, I + I_A1) -
-              scalar_trilinear_interpolate(u, I - I_A1)) / dxy
-        c2 = (scalar_trilinear_interpolate(u, I + I_A2) -
-              scalar_trilinear_interpolate(u, I - I_A2)) / dxy
-        c3 = (scalar_trilinear_interpolate(u, I + I_A3) -
-              scalar_trilinear_interpolate(u, I - I_A3)) / dθ
+        c1 = (
+            scalar_trilinear_interpolate(u, I + I_A1)
+            - scalar_trilinear_interpolate(u, I - I_A1)
+        ) / dxy
+        c2 = (
+            scalar_trilinear_interpolate(u, I + I_A2)
+            - scalar_trilinear_interpolate(u, I - I_A2)
+        ) / dxy
+        c3 = (
+            scalar_trilinear_interpolate(u, I + I_A3)
+            - scalar_trilinear_interpolate(u, I - I_A3)
+        ) / dθ
         A1_u[I] = c1
         A2_u[I] = c2
         A3_u[I] = c3
-        grad_norm_u[I] = ti.math.sqrt(G_inv[0] * c1**2 + G_inv[1] * c2**2 + G_inv[2] * c3**2)
+        grad_norm_u[I] = ti.math.sqrt(
+            G_inv[0] * c1**2 + G_inv[1] * c2**2 + G_inv[2] * c3**2
+        )
     convolve_with_kernel_x_dir(grad_norm_u, k_s, radius_s, TV_u)
     convolve_with_kernel_y_dir(TV_u, k_s, radius_s, storage)
     convolve_with_kernel_θ_dir(storage, k_o, radius_o, grad_norm_u)
@@ -488,10 +545,16 @@ def TV(
         I_A1 = ti.Vector([cos, sin, 0.0], dt=ti.f32) / 2
         I_A2 = ti.Vector([-sin, cos, 0.0], dt=ti.f32) / 2
 
-        divnormgrad1 = (scalar_trilinear_interpolate(normalised_grad_1, I + I_A1) -
-                        scalar_trilinear_interpolate(normalised_grad_1, I - I_A1)) / dxy
-        divnormgrad2 = (scalar_trilinear_interpolate(normalised_grad_2, I + I_A2) -
-                        scalar_trilinear_interpolate(normalised_grad_2, I - I_A2)) / dxy
-        divnormgrad3 = (scalar_trilinear_interpolate(normalised_grad_3, I + I_A3) -
-                        scalar_trilinear_interpolate(normalised_grad_3, I - I_A3)) / dθ
+        divnormgrad1 = (
+            scalar_trilinear_interpolate(normalised_grad_1, I + I_A1)
+            - scalar_trilinear_interpolate(normalised_grad_1, I - I_A1)
+        ) / dxy
+        divnormgrad2 = (
+            scalar_trilinear_interpolate(normalised_grad_2, I + I_A2)
+            - scalar_trilinear_interpolate(normalised_grad_2, I - I_A2)
+        ) / dxy
+        divnormgrad3 = (
+            scalar_trilinear_interpolate(normalised_grad_3, I + I_A3)
+            - scalar_trilinear_interpolate(normalised_grad_3, I - I_A3)
+        ) / dθ
         TV_u[I] = divnormgrad1 + divnormgrad2 + divnormgrad3
